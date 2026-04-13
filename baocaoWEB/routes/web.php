@@ -25,3 +25,7 @@ Route::get('/forgot-password', function () {
 Route::get('/byticket', function () {
     return view('layouts.byticket');
 })->name('byticket');
+
+Route::get('/byticket', function () {
+    return view('layouts/byticket');
+});

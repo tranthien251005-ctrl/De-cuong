@@ -26,6 +26,6 @@ Route::get('/byticket', function () {
     return view('layouts.byticket');
 })->name('byticket');
 
-Route::get('/byticket', function () {
-    return view('layouts/byticket');
-});
+Route::get('/bill', function () {
+    return view('layouts.bill');
+})->name('bill');

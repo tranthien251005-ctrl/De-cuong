@@ -27,6 +27,7 @@ Muc tieu cua he thong:
 | Frontend   | Blade, HTML, CSS, JavaScript |
 | Build tool | Vite, NPM |
 | Du lieu    | Supabase REST API cho dang nhap; cac migration mac dinh cua Laravel van duoc giu trong project |
+| Du lieu    | PHPMYADMIN|
 
 ## 📘 Tai lieu dac ta phan mem
 

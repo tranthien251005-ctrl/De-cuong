@@ -26,7 +26,7 @@ Muc tieu cua he thong:
 | Backend    | Laravel 12, PHP 8.2 |
 | Frontend   | Blade, HTML, CSS, JavaScript |
 | Build tool | Vite, NPM |
-| Du lieu    | Supabase REST API cho dang nhap; cac migration mac dinh cua Laravel van duoc giu trong project |
+| Du lieu    | PHPMYADMIN|
 
 ## 📘 Tai lieu dac ta phan mem
 

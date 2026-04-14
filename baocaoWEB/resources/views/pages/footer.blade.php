@@ -26,10 +26,10 @@
             <div class="footer-col">
                 <h3>Đi đến trang</h3>
                 <ul class="footer-links">
-                    <li><a href="/">Trang Chủ</a></li>
+                    <li><a href="{{ url('/') }}">Trang Chủ</a></li>
                     <li><a href="#">Lịch Trình</a></li>
-                    <li><a href="/register">Đăng ký</a></li>
-                    <li><a href="/login">Đăng Nhập</a></li>
+                    <li><a href="{{ route('register') }}">Đăng ký</a></li>
+                    <li><a href="{{ route('login') }}">Đăng Nhập</a></li>
                 </ul>
             </div>
 
@@ -54,7 +54,7 @@
 </footer>
 
 <style>
-    /* Reset margins để footer dài 100% */
+    /* Reset margins */
     * {
         margin: 0;
         padding: 0;
@@ -62,14 +62,15 @@
     }
 
     .main-footer {
-        background-color: #0F172A;  /* Màu nền theo yêu cầu */
+        background-color: #0F172A;
         color: #e2e8f0;
-        padding: 50px 0 20px;
-        width: 100%;  /* Chiều rộng 100% */
-        margin-top: 50px;
+        padding: 40px 0 20px;
+        width: 100%;
         position: relative;
         left: 0;
         right: 0;
+        margin-top: 0;
+        /* Không fixed, nằm cuối trang */
     }
 
     .footer-container {
@@ -88,12 +89,12 @@
 
     .footer-col {
         flex: 1;
-        min-width: 200px;
+        min-width: 180px;
     }
 
     .footer-col h3 {
         color: #ffffff;
-        font-size: 18px;
+        font-size: 16px;
         margin-bottom: 20px;
         font-weight: 600;
         position: relative;
@@ -105,15 +106,15 @@
         position: absolute;
         left: 0;
         bottom: 0;
-        width: 50px;
+        width: 40px;
         height: 2px;
         background: linear-gradient(90deg, #3b82f6, #0ea5e9);
     }
 
     .contact-info p {
-        margin: 12px 0;
-        line-height: 1.6;
-        font-size: 14px;
+        margin: 10px 0;
+        line-height: 1.5;
+        font-size: 13px;
         color: #cbd5e1;
     }
 
@@ -123,13 +124,13 @@
     }
 
     .footer-links li {
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
 
     .footer-links a {
         color: #cbd5e1;
         text-decoration: none;
-        font-size: 14px;
+        font-size: 13px;
         transition: all 0.3s ease;
         display: inline-block;
     }
@@ -138,20 +139,88 @@
         color: #3b82f6;
         transform: translateX(5px);
     }
-    .contact-info .phone{
-        font-size:25px;
+    
+    .contact-info .phone {
+        font-size: 20px;
         font-weight: 600;
     }
+    
     .footer-bottom {
         text-align: center;
-        padding-top: 25px;
+        padding-top: 20px;
         margin-top: 20px;
         border-top: 1px solid #1e293b;
     }
 
     .footer-bottom p {
-        font-size: 14px;
+        font-size: 12px;
         color: #94a3b8;
     }
 
+    /* Responsive cho footer */
+    @media (max-width: 768px) {
+        .main-footer {
+            padding: 30px 0 15px;
+        }
+        
+        .footer-content {
+            gap: 20px;
+        }
+        
+        .footer-col {
+            min-width: 150px;
+        }
+        
+        .footer-col h3 {
+            font-size: 14px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+        }
+        
+        .contact-info p {
+            font-size: 11px;
+            margin: 8px 0;
+        }
+        
+        .footer-links a {
+            font-size: 11px;
+        }
+        
+        .contact-info .phone {
+            font-size: 16px;
+        }
+        
+        .footer-bottom p {
+            font-size: 10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .footer-content {
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .footer-col {
+            min-width: 100%;
+            text-align: center;
+        }
+        
+        .footer-col h3::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .contact-info p {
+            text-align: center;
+        }
+        
+        .footer-links li {
+            text-align: center;
+        }
+        
+        .footer-links a:hover {
+            transform: translateX(0) scale(1.05);
+        }
+    }
 </style>

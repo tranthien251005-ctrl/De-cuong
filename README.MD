@@ -1,169 +1,211 @@
-# Software Requirement Specification (SRS)
-## Chức năng: Hệ thống Xác thực người dùng (User Authentication)
-**Mã chức năng:** AUTH-01  
-**Trạng thái:** Draft / Review  
-**Người soạn thảo:** [thientn]  
-**Vai trò:** Student
+# 🚌 Website Ban Ve Xe Bus
 
----
+> 🎓 De tai thuc tap tot nghiep - Lop LTWNC-D18CNPM2
 
-### 1. Mô tả tổng quan (Description): Cung cấp cơ chế xác thực an toàn để người dùng (Nghiên cứu viên/Quản trị viên) truy cập vào hệ thống quản lý dữ liệu và mô hình AI. Đảm bảo tính bảo mật cho các tài sản trí tuệ và kết quả thí nghiệm.
-Bài làm
-1. Mục tiêu
-Đảm bảo chỉ Nghiên cứu viên và Quản trị viên được ủy quyền mới có thể truy cập hệ thống quản lý dữ liệu và mô hình AI, bảo vệ tài sản trí tuệ và kết quả thí nghiệm.
+## 📌 Tong quan
 
-2. Chức năng chính
-2.1. Đăng ký và tạo tài khoản
-2.2. Đăng nhập
-2.3. Quản lý phiên làm việc
-2.4. Quản lý mật khẩu
+Day la du an xay dung website dat ve xe bus, trong do phan ung dung web duoc phat trien bang Laravel va luu trong thu muc `baocaoWEB`. Thu muc goc cua repo dong vai tro tap hop tai lieu de cuong, bao cao tien do va file huong dan.
 
-3. Bào mật và phòng chống tấn công
-3.1. Lưu mật khẩu: không lưu plain text, sử dụng thuật toán ‘Argon2’ hoặc ‘Bcrypt’
-3.2. Chống brute force: sai 5 lần liên tiếp tạm khóa 15 phút
-3.3. Chống dò thông tin: thông báo lỗi chung: “Thông tin đăng nhập không hợp lệ”
-3.4. Truyền tải: toàn bộ dữ liệu xác thực qua HTTPS/TLS.
+Muc tieu cua he thong:
 
-4. Phân quyền theo vai trò (RBAC)
-Quản trị viên (admin)
-- Tạo/sửa/xóa tài khoản người dùng.
-- Xem toàn bộ nhật ký hệ thống (audit log).
-- Thu hồi phiên làm việc của bất kỳ người dùng nào.
-- Bắt buộc MFA.
-Nghiên cứu viên (Researcher)
-- Chỉ xem và quản lý thông tin cá nhân.
-- Xem lịch sử đăng nhập của chính mình.
-- Tự đổi mật khẩu.
-- Không truy cập dữ liệu của người dùng khác.
+- 🔎 Ho tro nguoi dung tim kiem chuyen xe, xem lich trinh va thuc hien dat ve online.
+- 🔐 Cung cap giao dien dang nhap cho khach hang va tai khoan quan tri demo.
+- 🚀 Lam nen tang de phat trien tiep cac chuc nang quan ly chuyen xe, ghe ngoi, ve va nguoi dung.
 
-5. Giám sát và ghi nhật ký (audit)
-Ghi lại tất cả các sự kiện quan trọng
-- Đăng nhập thành công / thất bại.
-- Thay đổi mật khẩu.
-- Khóa / mở khóa tài khoản.
-- Thu hồi phiên làm việc.
+## 👥 Thanh vien nhom
 
-Thông tin log bao gồm:
-- User ID
-- Thời gian
-- Địa chỉ IP
-- Loại sự kiện
+| STT | Ho va ten         | MSSV        | Vai tro      |
+| --- | ----------------- | ----------- | ------------ |
+| 1   | Pham Dinh Luan    | 23810310282 | Nhom truong  |
+| 2   | Tran Ngoc Thien   | 23810310271 | Thanh vien   |
 
-6. Cảnh báo và xử lý bất thường
-Đăng nhập từ thiết bị/IP lạ: Hệ thống tự động gửi email cảnh báo: "Có đăng nhập mới từ [IP] – [vị trí gần đúng]. Nếu không phải bạn, hãy đổi mật khẩu ngay.".
-Khóa tài khoản vĩnh viễn (chờ Admin mở): Xảy ra khi có 10 lần đăng nhập sai liên tiếp trong 1 giờ hoặc phát hiện hành vi tấn công brute force.
+## 🛠️ Cong nghe su dung
 
-7. Hiệu năng và sẵn sàng
-Thời gian xác thực (<= 2s)
-Số người dùng đồng thời (>= 1000 người)
-Thời gian phục hồi sự cố (Tối đa 30 phút)
-8. Kết luận
-Hệ thống xác thực được thiết kế theo hướng an toàn, kiểm soát chặt chẽ, phân quyền rõ ràng, phù hợp với môi trường quản lý dữ liệu nghiên cứu và mô hình AI – nơi yêu cầu cao về bảo mật và khả năng kiểm toán.
+| Thanh phan | Cong nghe |
+| ---------- | --------- |
+| Backend    | Laravel 12, PHP 8.2 |
+| Frontend   | Blade, HTML, CSS, JavaScript |
+| Build tool | Vite, NPM |
+| Du lieu    | Supabase REST API cho dang nhap; cac migration mac dinh cua Laravel van duoc giu trong project |
 
-### 2. Luồng nghiệp vụ (User Workflow)
-| Bước | Hành động người dùng | Phản hồi hệ thống |
-| :--- | :--- | :--- |
-| 1 | Truy cập URL `/login` | Hiển thị Form đăng nhập (Email, Password, Remember Me). |
-| 2 | Nhập thông tin và nhấn "Login" | Validate định dạng dữ liệu đầu vào (Client-side & Server-side). |
-| 3 | Hệ thống kiểm tra thông tin | So khớp Email và mã hóa Password (Bcrypt) trong Database. |
-| 4 | Xác thực thành công | Khởi tạo Session/Token, chuyển hướng về Dashboard. |
-| 5 | Xác thực thất bại | Giữ nguyên trang, hiển thị thông báo lỗi và xóa trường Password. |
-Bài làm
-Bước	Hành động người dùng	Phản hồi hệ thống	Ghi chú
-1	Truy cập URL /login	Kiểm tra trạng thái session hiện tại.
-Nếu đã đăng nhập → tự động chuyển hướng về Dashboard.
-Nếu chưa đăng nhập → hiển thị Form đăng nhập (Email/Username, Password, Remember Me).	
-2	Nhập thông tin và nhấn "Login"	Client-side validation: Kiểm tra định dạng email, mật khẩu không để trống.
-Rate limiting check: Kiểm tra số lần đăng nhập sai từ IP này trong 15 phút qua.	Nếu vi phạm rate limit → thông báo "Tạm khóa 15 phút"
-3	Hệ thống kiểm tra thông tin	Server-side validation: Kiểm tra tài khoản tồn tại.
-So khớp mật khẩu: Sử dụng bcrypt để kiểm tra mật khẩu nhập vào với hash lưu trong DB.	
-4	Xác thực thành công	Kiểm tra MFA: Nếu tài khoản yêu cầu MFA → chuyển hướng sang trang xác thực MFA.
-Tạo session/token: JWT token (access + refresh) hoặc session ID.
-Ghi log: Lưu sự kiện đăng nhập thành công (IP, thời gian, User-Agent).
-Ghi nhớ: Nếu chọn "Remember Me" → kéo dài thời gian sống của refresh token (ví dụ 30 ngày).
-Chuyển hướng: Về Dashboard theo vai trò (Admin/Researcher).	
-5	Xác thực thất bại	Tăng biến đếm: Tăng số lần đăng nhập sai cho tài khoản/IP.
-Ghi log: Lưu sự kiện đăng nhập thất bại.
-Kiểm tra khóa tài khoản: Nếu đạt ngưỡng (5 lần sai) → khóa tạm 15 phút.
-Hiển thị thông báo: "Thông tin đăng nhập không hợp lệ" (chung chung).
-Xóa trường Password: Giữ lại Email/Username để người dùng nhập lại mật khẩu.	Không tiết lộ nguyên nhân cụ thể
+## 📘 Tai lieu dac ta phan mem
 
-### 3. Yêu cầu dữ liệu (Data Requirements)
-#### 3.1. Dữ liệu đầu vào (Input Fields)
-* **Email:** `string`, định dạng email hợp lệ, bắt buộc.
-* **Password:** `string`, tối thiểu 8 ký tự, ẩn ký tự khi nhập, bắt buộc.
-* **Remember Me:** `boolean`, tùy chọn (mặc định false).
+### 1. 🎯 Muc tieu va pham vi
 
-#### 3.2. Dữ liệu lưu trữ (Database - Bảng `users`)
-* `email`: unique, index.
-* `password`: hashed string.
-* `last_login_at`: timestamp (để theo dõi truy cập).
-* `login_ip`: string (phục vụ Audit Log).
-Bài làm
-####3.1. Dữ liệu đầu vào (Input Fields)
-Trường (Field)	Kiểu dữ liệu	Ràng buộc & Validation	Mô tả
-Email	string	Bắt buộc (required)
-Định dạng email hợp lệ (regex: ^[\w\.-]+@[\w\.-]+\.\w+$)
-Độ dài tối đa: 255 ký tự
-Không phân biệt chữ hoa/thường khi xử lý	Có thể nhập email hoặc username tùy theo cấu hình hệ thống
-Password	string	Bắt buộc (required)
-Tối thiểu: 12 ký tự (theo yêu cầu bảo mật từ mục 2.4)
-Tối đa: 128 ký tự
-Ẩn ký tự khi nhập (type="password")
-Hỗ trợ Unicode (cho phép ký tự đặc biệt, khoảng trắng)	Đáp ứng chính sách độ mạnh mật khẩu đã nêu
-Remember Me	boolean	Tùy chọn (optional)
-Mặc định: false
-Khi true: kéo dài thời gian sống của refresh token lên 30 ngày	Ảnh hưởng đến thời hạn của session/token
+He thong huong den bai toan dat ve xe bus tren web cho 2 nhom nguoi dung:
 
-####3.2. Dữ liệu lưu trữ (Database – Bảng `users`)
-Trường (Column)	Kiểu dữ liệu	Ràng buộc	Mô tả
-email	VARCHAR(255)	UNIQUE, NOT NULL, INDEX	Địa chỉ email liên lạc, dùng cho khôi phục mật khẩu và thông báo
-password	VARCHAR(255)	NOT NULL	Mật khẩu đã được băm bằng bcrypt (cost factor = 12) hoặc Argon2id
-last_login_at	TIMESTAMP	NULL	Thời gian đăng nhập thành công gần nhất (để theo dõi truy cập)
-login_ip	VARCHAR(45)	NULL	Địa chỉ IP của lần đăng nhập thành công gần nhất (IPv4 hoặc IPv6)
+- Khach hang: xem thong tin tuyen xe, dang nhap va thao tac dat ve.
+- Quan tri vien: duoc dinh huong de quan ly nguoi dung, chuyen xe, ve va bao cao.
 
-### 4. Ràng buộc kỹ thuật & Bảo mật (Technical Constraints)
-* **Giao thức:** Bắt buộc sử dụng **HTTPS** để mã hóa dữ liệu trên đường truyền.
-* **Bảo mật Form:** Tích hợp mã **CSRF Token** trong mọi request POST.
-* **Mã hóa:** Mật khẩu không bao giờ được lưu dưới dạng văn bản thuần (Plaintext). Sử dụng thuật toán `Argon2` hoặc `Bcrypt`.
-* **Throttling (Chống Brute-force):** Khóa tạm thời IP/Tài khoản nếu đăng nhập sai quá 5 lần trong 1 phút.
-Bài làm
-Hạng mục	Yêu cầu	Tóm tắt
-Giao thức	HTTPS	Bắt buộc TLS 1.2/1.3
-HTTP bị từ chối
-HSTS, X-Frame-Options: DENY, CSP
-Bảo mật form	CSRF Protection	Mọi POST/PUT/DELETE đều có CSRF token
-Cookie có SameSite=Lax, HttpOnly, Secure
-Mã hóa mật khẩu	Argon2id hoặc bcrypt	Không lưu plaintext
-bcrypt cost ≥ 12
-Mỗi user có salt riêng
-Chống Brute-force	Throttling	IP: tối đa 10 lần sai/5 phút → khóa 15 phút
-Tài khoản: 5 lần sai liên tiếp → khóa 15 phút
-10 lần sai/24h → khóa vĩnh viễn (chờ Admin)
+Pham vi hien tai cua repo tap trung vao giao dien va luong co ban:
 
-### 5. Trường hợp ngoại lệ & Xử lý lỗi (Edge Cases)
-* **Trường hợp:** Người dùng nhập sai định dạng email.  
-  * **Xử lý:** Hiển thị lỗi ngay tại field: "Email không đúng định dạng".
-* **Trường hợp:** Tài khoản đã bị quản trị viên khóa (Inactive).  
-  * **Xử lý:** Thông báo: "Tài khoản của bạn tạm thời bị đình chỉ. Vui lòng liên hệ Admin".
-* **Trường hợp:** Token CSRF hết hạn (do để trang quá lâu).  
-  * **Xử lý:** Redirect về trang login với thông báo "Phiên làm việc hết hạn, vui lòng thử lại".
-Bài làm
-STT	Trường hợp	Xử lý & Thông báo
-1	Email sai định dạng	Hiển thị ngay tại field: "Email không đúng định dạng"
-2	Tài khoản bị Admin khóa (inactive)	"Tài khoản của bạn tạm thời bị đình chỉ. Vui lòng liên hệ Admin"
-3	Token CSRF hết hạn	Redirect về /login kèm thông báo: "Phiên làm việc hết hạn, vui lòng thử lại"
+- Trang chu hien thi danh sach tuyen xe mau.
+- Trang dang nhap co xac thuc bang so dien thoai va mat khau.
+- Trang dat ve co tim chuyen, chon ngay, chon ghe va tinh tong tien o muc demo giao dien.
 
-### 6. Giao diện (UI/UX)
-* Thiết kế Responsive (hoạt động tốt trên cả Desktop và Mobile).
-* Nút "Login" hiển thị trạng thái `processing` (spinner) khi đang gửi request.
-* Hỗ trợ phím tắt: Nhấn `Enter` để gửi form.
-Bài làm
-Hạng mục	Yêu cầu
-Responsive	Hoạt động tốt trên Desktop, Tablet, Mobile
-Nút Login	Hiển thị spinner + vô hiệu hóa khi đang xử lý
-Phím tắt	Nhấn Enter để gửi form
-Hiển thị lỗi	Inline validation, hiển thị ngay dưới field
-Password	Có nút hiện/ẩn mật khẩu (eye icon)
-Remember Me	Checkbox, mặc định không chọn
-Link hỗ trợ	"Quên mật khẩu?" và "Liên hệ Admin"
+### 2. 👤 Tac nhan he thong
+
+| Tac nhan | Mo ta |
+| -------- | ----- |
+| Khach vang lai | Truy cap trang chu, xem giao dien, mo trang dang nhap/dat ve |
+| Nguoi dung da dang ky | Dang nhap bang thong tin tai khoan luu tren Supabase |
+| Admin demo | Dang nhap bang tai khoan `admin / 12345678`, duoc dieu huong sang khu vuc quan tri du kien |
+
+### 3. ✅ Yeu cau chuc nang
+
+| Ma | Chuc nang | Mo ta | Trang thai |
+| --- | --------- | ----- | ---------- |
+| AUTH-01 | Dang nhap | Nguoi dung dang nhap bang so dien thoai va mat khau; du lieu hien dang doc tu bang `taiKhoan` qua Supabase REST API | Da co ban |
+| AUTH-02 | Dang xuat | Xoa session dang nhap va dieu huong ve trang dang nhap | Da co ban |
+| HOME-01 | Trang chu | Hien thi header, footer, khu vuc hero, danh sach cac tuyen xe mau va nut dat ve | Da co ban |
+| SEARCH-01 | Tim chuyen xe | Chon diem di, diem den, ngay di o trang chu va trang dat ve | Demo giao dien |
+| BOOK-01 | Dat ve | Chon ghe, xem thong tin chuyen, tinh tong tien va xac nhan dat ve bang thong bao client-side | Demo giao dien |
+| AUTH-03 | Dang ky | Da co file view mau `resources/views/auth/register.blade.php` nhung chua co controller va route hoat dong | Dang phat trien |
+| AUTH-04 | Quen mat khau | Route da duoc khai bao nhung chua co view xu ly | Chua hoan tat |
+| ADMIN-01 | Quan tri he thong | Luong admin moi dung o muc dang nhap demo; route/man hinh `/admin` chua duoc dinh nghia trong repo hien tai | Chua trien khai |
+| DATA-01 | Dong bo du lieu chuyen xe/ve/ghe | Chua co API va model nghiep vu rieng cho dat ve, chuyen xe, ghe ngoi | Chua trien khai |
+
+### 4. 🔒 Yeu cau phi chuc nang
+
+- Giao dien phai hien thi duoc tren trinh duyet desktop va mobile co ban.
+- Form dang nhap co kiem tra du lieu dau vao truoc khi xu ly.
+- Session duoc dung de luu trang thai dang nhap.
+- Cau hinh nhay cam duoc tach trong file `.env`, dac biet la `SUPABASE_URL` va `SUPABASE_ANON_KEY`.
+- Cau truc project giu dung convention cua Laravel de de mo rong ve sau.
+
+### 5. 🧩 Rang buoc va hien trang ky thuat
+
+- Chuc nang dat ve hien tai chu yeu la demo giao dien, chua ghi du lieu dat ve xuong co so du lieu.
+- Du an chua co `routes/api.php` va chua xay dung lop service nghiep vu rieng.
+- Chuc nang dang ky va quen mat khau moi o muc khung giao dien/route, chua du de van hanh thuc te.
+- Tai lieu trong `reports/` la minh chung tien do va anh chup man hinh cho qua trinh phat trien.
+
+## 📂 Cau truc thu muc du an
+
+### 1. 🗂️ Thu muc goc
+
+```text
+du an/
+|-- README.MD
+|-- DECUONG.MD
+|-- reports/
+|   |-- REPORT_20260403.md
+|   `-- images/
+`-- baocaoWEB/
+```
+
+Y nghia:
+
+- 📄 `README.MD`: tai lieu tong quan du an, dac ta rut gon va huong dan cai dat.
+- 📝 `DECUONG.MD`: de cuong mon hoc va danh sach chuc nang nghiep vu mong muon.
+- 🖼️ `reports/`: bao cao tien do theo ngay va anh chup giao dien.
+- 💻 `baocaoWEB/`: ma nguon ung dung Laravel.
+
+### 2. 🏗️ Cau truc chinh trong `baocaoWEB`
+
+```text
+baocaoWEB/
+|-- app/
+|   |-- Http/Controllers/
+|   |   `-- LoginController.php
+|   |-- Models/
+|   `-- Providers/
+|-- bootstrap/
+|-- config/
+|-- database/
+|   |-- factories/
+|   |-- migrations/
+|   `-- seeders/
+|-- public/
+|   |-- css/
+|   `-- index.php
+|-- resources/
+|   |-- css/
+|   |-- js/
+|   `-- views/
+|       |-- auth/
+|       |-- layouts/
+|       `-- pages/
+|-- routes/
+|   |-- console.php
+|   `-- web.php
+|-- storage/
+|-- tests/
+|-- artisan
+|-- composer.json
+|-- package.json
+`-- vite.config.js
+```
+
+Mo ta nhanh:
+
+- ⚙️ `app/Http/Controllers/`: xu ly request; hien tai tap trung vao dang nhap.
+- 🔐 `resources/views/auth/`: giao dien dang nhap va khung dang ky.
+- 🏠 `resources/views/layouts/`: giao dien trang chu va trang dat ve.
+- 🧱 `resources/views/pages/`: header va footer dung chung.
+- 🎨 `public/css/`: file CSS thu cong cho trang chu, dang nhap va dat ve.
+- 🛣️ `routes/web.php`: dinh nghia cac route giao dien web.
+- 🗃️ `database/migrations/`: migration mac dinh cua Laravel, san sang cho viec mo rong CSDL.
+- 🧪 `tests/`: bo test mac dinh cua Laravel, chua co test nghiep vu rieng.
+
+## ⚙️ Huong dan cai dat
+
+### 1. 🧰 Yeu cau moi truong
+
+- PHP 8.2 tro len
+- Composer
+- Node.js va NPM
+- Tai khoan Supabase neu muon kiem thu luong dang nhap nguoi dung thuc
+
+### 2. 📥 Cai dat du an
+
+```bash
+cd baocaoWEB
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+```
+
+Neu dung PowerShell tren Windows, co the thay lenh sao chep `.env` bang:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+### 3. 🔑 Cau hinh bien moi truong
+
+Cap nhat it nhat cac bien sau trong file `.env`:
+
+```env
+APP_NAME="Website Ban Ve Xe Bus"
+APP_URL=http://127.0.0.1:8000
+
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+```
+
+Neu can su dung cac bang mac dinh cua Laravel:
+
+```bash
+php artisan migrate
+```
+
+### 4. ▶️ Chay ung dung
+
+```bash
+npm run dev
+php artisan serve
+```
+
+Truy cap: `http://127.0.0.1:8000`
+
+## 🔗 Tai lieu lien quan
+
+- [De cuong mon hoc](./DECUONG.MD)
+- [Bao cao ngay 03/04/2026](./reports/REPORT_20260403.md)
+
+## 📌 Ghi chu
+
+- README nay duoc viet theo trang thai code hien co trong repo, khong mo ta vuot qua nhung gi dang ton tai.
+- Neu bo sung cac module nhu dang ky, admin, quan ly chuyen xe hoac thanh toan, can cap nhat lai bang yeu cau chuc nang va cau truc thu muc.

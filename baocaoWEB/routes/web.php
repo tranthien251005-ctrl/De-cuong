@@ -14,8 +14,8 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Registration Routes
-// Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
-// Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
+Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
 
 // Password Reset Routes (nếu có)
 Route::get('/forgot-password', function () {

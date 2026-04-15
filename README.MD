@@ -1,6 +1,6 @@
 # 🚌 Website Ban Ve Xe Bus
 
-> 🎓 De tai thuc tap tot nghiep - Lop LTWNC-D18CNPM2
+> 🎓 De tai bap cao cuoi ky web nang cao - Lop LTWNC-D18CNPM2
 
 ## 📌 Tong quan
 

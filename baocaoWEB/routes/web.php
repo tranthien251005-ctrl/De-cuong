@@ -26,6 +26,10 @@ Route::get('/byticket', function () {
     return view('layouts.byticket');
 })->name('byticket');
 
+Route::get('/payment', function () {
+    return view('layouts.payment');
+})->name('payment');
+
 Route::get('/bill', function () {
     return view('layouts.bill');
 })->name('bill');

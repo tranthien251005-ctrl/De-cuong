@@ -88,7 +88,7 @@
                 <div class="info-row"><span>Biển số xe:</span><span>65D1-50354</span></div>
                 <div class="info-row"><span>Đơn giá / vé:</span><span><strong>150.000đ</strong></span></div>
                 <div class="total-price" id="totalPriceDisplay">0đ</div>
-                <button class="btn-book-final" id="bookNowBtn"><i class="fas fa-check-circle"></i> ĐẶT VÉ NGAY</button>
+                <button type="button" class="btn-book-final" id="bookNowBtn"><i class="fas fa-check-circle"></i> ĐẶT VÉ NGAY</button>
                 <p style="font-size: 11px; margin-top: 12px; color:#6c86a3;"><i class="fas fa-shield-alt"></i> Hoàn vé linh hoạt · Thanh toán an toàn</p>
             </div>
         </div>
@@ -97,6 +97,7 @@
 @include('pages.footer')
 <script>
     // === KHỞI TẠO DỮ LIỆU GHẾ VÀ TÍNH NĂNG CHỌN (UI THUẦN) ===
+    const paymentPageUrl = @json(route('payment'));
     const seatLabels = ['A01','A02','A03','A04','A05','B01','B02','B03','B04','B05','C01','C02','C03','C04','C05','D01','D02','D03','D04','D05'];
     // 20 ghế, một số ghế booked (demo)
     let seatStatus = {
@@ -145,11 +146,9 @@
         document.getElementById('selectedSeatsLabel').innerText = selectedCount === 0 ? 'Chưa có ghế' : selectedSeats.join(', ');
         document.getElementById('totalPriceDisplay').innerHTML = total.toLocaleString('vi-VN') + 'đ';
         const bookBtn = document.getElementById('bookNowBtn');
-        if (selectedCount === 0) {
-            bookBtn.style.opacity = '0.7';
-        } else {
-            bookBtn.style.opacity = '1';
-        }
+        bookBtn.disabled = selectedCount === 0;
+        bookBtn.style.opacity = selectedCount === 0 ? '0.7' : '1';
+        bookBtn.style.cursor = selectedCount === 0 ? 'not-allowed' : 'pointer';
     }
 
     // Cập nhật ngày hiện tại và min date (không cho chọn quá khứ)
@@ -217,16 +216,39 @@
 
     // đặt vé
     document.getElementById('bookNowBtn')?.addEventListener('click', () => {
-        if (selectedSeats.length === 0) {
-            alert('⚠️ Vui lòng chọn ít nhất 1 ghế trước khi đặt vé.');
-            return;
-        }
         const date = document.getElementById('travelDate').value;
         const from = fromSelect.options[fromSelect.selectedIndex]?.value || '?';
         const to = toSelect.options[toSelect.selectedIndex]?.value || '?';
         const formattedDate = date ? new Date(date).toLocaleDateString('vi-VN') : 'Chưa rõ';
-        alert(`✅ Đặt vé thành công!\nTuyến: ${from} → ${to}\nNgày: ${formattedDate}\nGhế: ${selectedSeats.join(', ')}\nTổng tiền: ${(selectedSeats.length * 150000).toLocaleString('vi-VN')}đ\nCảm ơn bạn đã chọn MY BUS!`);
-        // Giữ nguyên trạng thái ghế đã chọn để demo, có thể reset nếu muốn
+        const totalAmount = selectedSeats.length * 150000;
+        const now = new Date();
+        const ticketCode = `VE-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+        const query = new URLSearchParams({
+            from,
+            to,
+            date: formattedDate,
+            seats: selectedSeats.join(', '),
+            ticketCode,
+            total: totalAmount.toLocaleString('vi-VN') + ' VND'
+        });
+
+        fetch(paymentPageUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                from,
+                to,
+                date: formattedDate,
+                seats: selectedSeats.join(', '),
+                ticketCode,
+                total: totalAmount
+            })
+        }).then(() => {
+            window.location.href = paymentPageUrl;
+        });
     });
 
     // khởi tạo giao diện ghế

@@ -1,6 +1,6 @@
 # 🚌 Website Ban Ve Xe Bus
 
-> 🎓 De tai thuc tap tot nghiep - Lop LTWNC-D18CNPM2
+> 🎓 De tai bao cao cuoi ky web nang cao - Lop LTWNC-D18CNPM2
 
 ## 📌 Tong quan
 
@@ -14,20 +14,20 @@ Muc tieu cua he thong:
 
 ## 👥 Thanh vien nhom
 
-| STT | Ho va ten         | MSSV        | Vai tro      |
-| --- | ----------------- | ----------- | ------------ |
-| 1   | Pham Dinh Luan    | 23810310282 | Nhom truong  |
-| 2   | Tran Ngoc Thien   | 23810310271 | Thanh vien   |
+| STT | Ho va ten       | MSSV        | Vai tro     |
+| --- | --------------- | ----------- | ----------- |
+| 1   | Pham Dinh Luan  | 23810310282 | Nhom truong |
+| 2   | Tran Ngoc Thien | 23810310271 | Thanh vien  |
 
 ## 🛠️ Cong nghe su dung
 
-| Thanh phan | Cong nghe |
-| ---------- | --------- |
-| Backend    | Laravel 12, PHP 8.2 |
-| Frontend   | Blade, HTML, CSS, JavaScript |
-| Build tool | Vite, NPM |
+| Thanh phan | Cong nghe                                                                                      |
+| ---------- | ---------------------------------------------------------------------------------------------- |
+| Backend    | Laravel 12, PHP 8.2                                                                            |
+| Frontend   | Blade, HTML, CSS, JavaScript                                                                   |
+| Build tool | Vite, NPM                                                                                      |
 | Du lieu    | Supabase REST API cho dang nhap; cac migration mac dinh cua Laravel van duoc giu trong project |
-| Du lieu    | PHPMYADMIN|
+| Du lieu    | PHPMYADMIN                                                                                     |
 
 ## 📘 Tai lieu dac ta phan mem
 
@@ -46,25 +46,25 @@ Pham vi hien tai cua repo tap trung vao giao dien va luong co ban:
 
 ### 2. 👤 Tac nhan he thong
 
-| Tac nhan | Mo ta |
-| -------- | ----- |
-| Khach vang lai | Truy cap trang chu, xem giao dien, mo trang dang nhap/dat ve |
-| Nguoi dung da dang ky | Dang nhap bang thong tin tai khoan luu tren Supabase |
-| Admin demo | Dang nhap bang tai khoan `admin / 12345678`, duoc dieu huong sang khu vuc quan tri du kien |
+| Tac nhan              | Mo ta                                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| Khach vang lai        | Truy cap trang chu, xem giao dien, mo trang dang nhap/dat ve                               |
+| Nguoi dung da dang ky | Dang nhap bang thong tin tai khoan luu tren Supabase                                       |
+| Admin demo            | Dang nhap bang tai khoan `admin / 12345678`, duoc dieu huong sang khu vuc quan tri du kien |
 
 ### 3. ✅ Yeu cau chuc nang
 
-| Ma | Chuc nang | Mo ta | Trang thai |
-| --- | --------- | ----- | ---------- |
-| AUTH-01 | Dang nhap | Nguoi dung dang nhap bang so dien thoai va mat khau; du lieu hien dang doc tu bang `taiKhoan` qua Supabase REST API | Da co ban |
-| AUTH-02 | Dang xuat | Xoa session dang nhap va dieu huong ve trang dang nhap | Da co ban |
-| HOME-01 | Trang chu | Hien thi header, footer, khu vuc hero, danh sach cac tuyen xe mau va nut dat ve | Da co ban |
-| SEARCH-01 | Tim chuyen xe | Chon diem di, diem den, ngay di o trang chu va trang dat ve | Demo giao dien |
-| BOOK-01 | Dat ve | Chon ghe, xem thong tin chuyen, tinh tong tien va xac nhan dat ve bang thong bao client-side | Demo giao dien |
-| AUTH-03 | Dang ky | Da co file view mau `resources/views/auth/register.blade.php` nhung chua co controller va route hoat dong | Dang phat trien |
-| AUTH-04 | Quen mat khau | Route da duoc khai bao nhung chua co view xu ly | Chua hoan tat |
-| ADMIN-01 | Quan tri he thong | Luong admin moi dung o muc dang nhap demo; route/man hinh `/admin` chua duoc dinh nghia trong repo hien tai | Chua trien khai |
-| DATA-01 | Dong bo du lieu chuyen xe/ve/ghe | Chua co API va model nghiep vu rieng cho dat ve, chuyen xe, ghe ngoi | Chua trien khai |
+| Ma        | Chuc nang                        | Mo ta                                                                                                               | Trang thai      |
+| --------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------- |
+| AUTH-01   | Dang nhap                        | Nguoi dung dang nhap bang so dien thoai va mat khau; du lieu hien dang doc tu bang `taiKhoan` qua Supabase REST API | Da co ban       |
+| AUTH-02   | Dang xuat                        | Xoa session dang nhap va dieu huong ve trang dang nhap                                                              | Da co ban       |
+| HOME-01   | Trang chu                        | Hien thi header, footer, khu vuc hero, danh sach cac tuyen xe mau va nut dat ve                                     | Da co ban       |
+| SEARCH-01 | Tim chuyen xe                    | Chon diem di, diem den, ngay di o trang chu va trang dat ve                                                         | Demo giao dien  |
+| BOOK-01   | Dat ve                           | Chon ghe, xem thong tin chuyen, tinh tong tien va xac nhan dat ve bang thong bao client-side                        | Demo giao dien  |
+| AUTH-03   | Dang ky                          | Da co file view mau `resources/views/auth/register.blade.php` nhung chua co controller va route hoat dong           | Dang phat trien |
+| AUTH-04   | Quen mat khau                    | Route da duoc khai bao nhung chua co view xu ly                                                                     | Chua hoan tat   |
+| ADMIN-01  | Quan tri he thong                | Luong admin moi dung o muc dang nhap demo; route/man hinh `/admin` chua duoc dinh nghia trong repo hien tai         | Chua trien khai |
+| DATA-01   | Dong bo du lieu chuyen xe/ve/ghe | Chua co API va model nghiep vu rieng cho dat ve, chuyen xe, ghe ngoi                                                | Chua trien khai |
 
 ### 4. 🔒 Yeu cau phi chuc nang
 

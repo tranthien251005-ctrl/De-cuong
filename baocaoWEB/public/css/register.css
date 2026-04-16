@@ -35,8 +35,8 @@ body {
     align-items: center;
     justify-content: center;
     width: 100%;
-    margin-top: 70px; /* Khoảng cách cho header fixed */
-    margin-bottom: 0;
+    margin-top: 30px;
+    margin-bottom: 30px; /* Thêm dòng này */
     padding: 20px;
 }
 
@@ -182,7 +182,7 @@ body {
 .btn-register:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(94, 234, 212, 0.25);
-    background: linear-gradient(135deg, #2dd4bf 0%, #5eead4 100%);
+    background: linear-gradient(135deg, #77ffed 0%, #5eead4 100%);
     color: #0f3a35;
 }
 

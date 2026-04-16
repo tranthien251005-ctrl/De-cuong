@@ -28,17 +28,6 @@ body {
     min-height: 100vh;
 }
 
-/* Header fixed */
-.main-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    z-index: 1000;
-    width: 100%;
-}
-
 /* Container chính - co giãn linh hoạt */
 .main-wrapper {
     flex: 1;
@@ -46,8 +35,8 @@ body {
     align-items: center;
     justify-content: center;
     width: 100%;
-    margin-top: 70px; /* Khoảng cách cho header */
-    margin-bottom: 0;
+    margin-top: 30px; /* Khoảng cách cho header */
+    margin-bottom: 30px; /* Giảm khoảng cách với footer */
     padding: 20px;
 }
 
@@ -157,12 +146,19 @@ body {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
-.btn-login:hover {
+.btn-login:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(30, 201, 176, 0.3);
+    box-shadow: 0 4px 12px rgba(94, 234, 212, 0.25);
+    background: linear-gradient(135deg, #77ffed 0%, #5eead4 100%);
+    color: #0f3a35;
+}
+
+.btn-login:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* Links */
@@ -177,6 +173,11 @@ body {
     color: #14b8a6;
     text-decoration: none;
     font-weight: 600;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+    color: #0d9488;
 }
 
 .forgot-password {
@@ -196,7 +197,7 @@ body {
     color: #e2e8f0;
     padding: 30px 0 15px;
     width: 100%;
-    margin-top: auto;
+    margin-top: 0; /* Loại bỏ margin-top auto để footer sát hơn */
 }
 
 .footer-container {
@@ -269,11 +270,12 @@ body {
     color: #94a3b8;
 }
 
-/* ========== QUAN TRỌNG: XỬ LÝ ZOOM ========== */
+/* ========== XỬ LÝ ZOOM ========== */
 /* Khi zoom nhỏ lại (thu nhỏ trình duyệt) */
 @media screen and (max-width: 600px) {
     .main-wrapper {
         margin-top: 60px;
+        margin-bottom: 30px;
         padding: 15px;
     }
 
@@ -337,6 +339,7 @@ body {
 @media screen and (max-width: 400px) {
     .main-wrapper {
         margin-top: 55px;
+        margin-bottom: 25px;
         padding: 10px;
     }
 

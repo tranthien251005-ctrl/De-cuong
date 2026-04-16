@@ -107,7 +107,7 @@
                         </div>
 
                         <button type="submit" class="btn-register" id="submitBtn">
-                            Xác nhận đăng ký
+                            Đăng ký
                         </button>
 
                         <div class="login-link">

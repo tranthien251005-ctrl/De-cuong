@@ -33,11 +33,12 @@
         box-sizing: border-box;
     }
     
+    /* Important: Body padding-top để tránh header đè lên nội dung */
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background: #f4f4f4;
         color: #333;
-        padding-top: 0; /* Để main-wrapper xử lý margin-top */
+        padding-top: 70px !important; /* Bù cho header fixed */
     }
     
     .main-header {
@@ -82,7 +83,6 @@
         display: flex;
         list-style: none;
         gap: 20px;
-        /* flex-wrap: wrap; */
     }
     
     .navbar ul li a {
@@ -100,6 +100,13 @@
     
     .user-actions {
         margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .user-actions span {
+        font-size: 14px;
     }
     
     .user-actions a,
@@ -108,7 +115,7 @@
         text-decoration: none;
         padding: 5px 12px;
         border-radius: 6px;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 500;
         border: none;
         cursor: pointer;
@@ -130,6 +137,12 @@
     }
     
     /* Responsive header */
+    @media (max-width: 768px) {
+        body {
+            padding-top: 120px !important;
+        }
+    }
+    
     @media (max-width: 700px) {
         .container-header {
             flex-direction: column;
@@ -144,11 +157,16 @@
         }
         
         .user-actions {
+            margin-left: 0;
             justify-content: center;
         }
     }
     
     @media (max-width: 480px) {
+        body {
+            padding-top: 150px !important;
+        }
+        
         .logo h1 {
             font-size: 16px;
         }
@@ -158,13 +176,17 @@
         }
         
         .navbar ul li a {
-            font-size: 11px;
+            font-size: 12px;
         }
         
         .user-actions a,
         .logout-btn {
             padding: 4px 10px;
-            font-size: 11px;
+            font-size: 12px;
+        }
+        
+        .user-actions span {
+            font-size: 12px;
         }
     }
 </style>

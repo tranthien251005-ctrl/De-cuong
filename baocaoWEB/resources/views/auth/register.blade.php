@@ -2,14 +2,13 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Đăng Ký - {{ config('app.name', 'Laravel') }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ asset('css/register.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
+    <link rel="stylesheet" href="{{ asset('css/register.css') }}">
+    
 </head>
 <body>
     {{-- Include header --}}
@@ -40,13 +39,13 @@
                         @csrf
                         
                         <div class="input-group">
-                            <label for="fullName">Họ và tên</label>
+                            <label for="full_name">Họ và tên</label>
                             <input 
                                 type="text" 
-                                id="fullName"
-                                name="fullName"
+                                id="full_name"
+                                name="full_name"
                                 placeholder="Nhập họ và tên của bạn" 
-                                value="{{ old('fullName') }}"
+                                value="{{ old('full_name') }}"
                                 required
                             >
                         </div>
@@ -77,33 +76,30 @@
 
                         <div class="input-group">
                             <label for="password">Mật khẩu</label>
-                            <input 
-                                type="password" 
-                                id="password"
-                                name="password"
-                                placeholder="Nhập mật khẩu (tối thiểu 8 ký tự)" 
-                                required
-                            >
+                            <div class="password-wrapper">
+                                <input 
+                                    type="password" 
+                                    id="password"
+                                    name="password"
+                                    placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" 
+                                    required
+                                >
+                                <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                            </div>
                         </div>
 
                         <div class="input-group">
                             <label for="password_confirmation">Xác nhận mật khẩu</label>
-                            <input 
-                                type="password" 
-                                id="password_confirmation"
-                                name="password_confirmation"
-                                placeholder="Nhập lại mật khẩu" 
-                                required
-                            >
-                        </div>
-
-                        <div class="checkbox-group">
-                            <input 
-                                type="checkbox" 
-                                id="showPassword"
-                                class="show-password-checkbox"
-                            >
-                            <label for="showPassword">Hiển thị mật khẩu</label>
+                            <div class="password-wrapper">
+                                <input 
+                                    type="password" 
+                                    id="password_confirmation"
+                                    name="password_confirmation"
+                                    placeholder="Nhập lại mật khẩu" 
+                                    required
+                                >
+                                <i class="fas fa-eye toggle-password" id="toggleConfirmPassword"></i>
+                            </div>
                         </div>
 
                         <button type="submit" class="btn-register" id="submitBtn">
@@ -123,5 +119,7 @@
     {{-- Include footer --}}
     @include('pages.footer')
 
+    {{-- Script riêng --}}
+    <script src="{{ asset('js/register.js') }}"></script>
 </body>
 </html>

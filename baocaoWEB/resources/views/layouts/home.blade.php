@@ -57,170 +57,81 @@
 
     <!-- NỘI DUNG CHÍNH: DANH SÁCH TUYẾN XE -->
     <div class="main-container">
-        <div class="page-title">
-            <i class="fas fa-map-marked-alt"></i>
-            🚍 DANH SÁCH TUYẾN XE TRỰC TUYẾN
-            <i class="fas fa-ticket-alt"></i>
+    <div class="page-title">
+        <i class="fas fa-map-marked-alt"></i>
+        🚍 DANH SÁCH TUYỂN XE TRỰC TUYẾN
+        <i class="fas fa-ticket-alt"></i>
+    </div>
+
+    <div class="routes-grid">
+    @forelse($tuyenXes as $tuyen)
+        <div class="route-card">
+            <div class="route-header">
+                <i class="fas fa-route"></i> {{ $tuyen->tentuyen }}
+            </div>
+            <div class="route-body">
+                <div class="route-points">
+                    <span class="from-to">{{ $tuyen->diemdi }}</span>
+                    <span class="arrow"><i class="fas fa-long-arrow-alt-right"></i></span>
+                    <span class="from-to">{{ $tuyen->diemden }}</span>
+                </div>
+                
+                <div class="route-info">
+                    <div class="info-item">
+                        <div class="info-label">⏱️ THỜI GIAN</div>
+                        <div class="info-value">{{ $tuyen->thoigiandukien }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">📍 KHOẢNG CÁCH</div>
+                        <div class="info-value">{{ $tuyen->khoangcach }}KM</div>
+                    </div>
+                </div>
+                
+                <div class="times">
+                    <span class="time-badge"> 
+                        <i class="far fa-clock"></i>
+                        {{ $tuyen->giodi ? \Carbon\Carbon::parse($tuyen->giodi)->format('H:i') : '--:--' }}
+                    </span>
+                    @if($tuyen->gioden)
+                        <span><i class="fas fa-arrow-right"></i></span>
+                        <span class="time-badge">
+                            <i class="far fa-clock"></i> {{ \Carbon\Carbon::parse($tuyen->gioden)->format('H:i') }}
+                        </span>
+                    @endif
+                </div>
+                
+                <div class="price-section">
+                    <div class="price-label">GIÁ VÉ TỪ</div>
+                    <div class="price-value">
+                        {{ number_format($tuyen->giatien, 0, ',', '.') }} 
+                        <span class="price-unit">.000 vnđ</span>
+                    </div>
+                </div>
+                
+                <button class="btn-book" onclick="bookRoute({{ $tuyen->id }})">
+                    <i class="fas fa-calendar-check"></i> ĐẶT NGAY
+                </button>
+            </div>
         </div>
-
-        <div class="routes-grid">
-            <!-- TUYẾN SỐ 1 - Nam Định → Hà Nội (03:00) -->
-            <div class="route-card">
-                <div class="route-header"><i class="fas fa-route"></i> TUYẾN SỐ 1</div>
-                <div class="route-body">
-                    <div class="route-points">
-                        <span class="from-to">Nam Định</span>
-                        <span class="arrow"><i class="fas fa-long-arrow-alt-right"></i></span>
-                        <span class="from-to">Hà Nội</span>
-                    </div>
-                    <div class="route-info">
-                        <div class="info-item"><div class="info-label">⏱️ THỜI GIAN</div><div class="info-value">3H</div></div>
-                        <div class="info-item"><div class="info-label">📍 KHOẢNG CÁCH</div><div class="info-value">150KM</div></div>
-                    </div>
-                    <div class="times">
-                        <span class="time-badge"><i class="far fa-clock"></i> 03:00</span>
-                        <span><i class="fas fa-arrow-right"></i></span>
-                        <span class="time-badge"><i class="far fa-clock"></i> 06:00</span>
-                    </div>
-                    <div class="price-section">
-                        <div class="price-label">GIÁ VÉ TỪ</div>
-                        <div class="price-value">150.000 <span class="price-unit">đ</span></div>
-                    </div>
-                    <button class="btn-book"><i class="fas fa-calendar-check"></i> ĐẶT NGAY</button>
-                </div>
+    @empty
+        <div class="route-card" style="grid-column: 1 / -1;">
+            <div class="route-header">
+                <i class="fas fa-route"></i> Chưa có tuyến xe
             </div>
-
-            <!-- TUYẾN SỐ 2 - Hà Nội → Nam Định (08:00) -->
-            <div class="route-card">
-                <div class="route-header"><i class="fas fa-route"></i> TUYẾN SỐ 2</div>
-                <div class="route-body">
-                    <div class="route-points">
-                        <span class="from-to">Hà Nội</span>
-                        <span class="arrow"><i class="fas fa-long-arrow-alt-right"></i></span>
-                        <span class="from-to">Nam Định</span>
-                    </div>
-                    <div class="route-info">
-                        <div class="info-item"><div class="info-label">⏱️ THỜI GIAN</div><div class="info-value">3H</div></div>
-                        <div class="info-item"><div class="info-label">📍 KHOẢNG CÁCH</div><div class="info-value">150KM</div></div>
-                    </div>
-                    <div class="times">
-                        <span class="time-badge"><i class="far fa-clock"></i> 08:00</span>
-                        <span><i class="fas fa-arrow-right"></i></span>
-                        <span class="time-badge"><i class="far fa-clock"></i> 11:00</span>
-                    </div>
-                    <div class="price-section">
-                        <div class="price-label">GIÁ VÉ TỪ</div>
-                        <div class="price-value">150.000 <span class="price-unit">đ</span></div>
-                    </div>
-                    <button class="btn-book"><i class="fas fa-calendar-check"></i> ĐẶT NGAY</button>
-                </div>
-            </div>
-
-            <!-- TUYẾN SỐ 3 - Nam Định → Hà Nội (14:00) -->
-            <div class="route-card">
-                <div class="route-header"><i class="fas fa-route"></i> TUYẾN SỐ 3</div>
-                <div class="route-body">
-                    <div class="route-points">
-                        <span class="from-to">Nam Định</span>
-                        <span class="arrow"><i class="fas fa-long-arrow-alt-right"></i></span>
-                        <span class="from-to">Hà Nội</span>
-                    </div>
-                    <div class="route-info">
-                        <div class="info-item"><div class="info-label">⏱️ THỜI GIAN</div><div class="info-value">5H</div></div>
-                        <div class="info-item"><div class="info-label">📍 KHOẢNG CÁCH</div><div class="info-value">150KM</div></div>
-                    </div>
-                    <div class="times">
-                        <span class="time-badge"><i class="far fa-clock"></i> 14:00</span>
-                        <span><i class="fas fa-arrow-right"></i></span>
-                        <span class="time-badge"><i class="far fa-clock"></i> 17:00</span>
-                    </div>
-                    <div class="price-section">
-                        <div class="price-label">GIÁ VÉ TỪ</div>
-                        <div class="price-value">150.000 <span class="price-unit">đ</span></div>
-                    </div>
-                    <button class="btn-book"><i class="fas fa-calendar-check"></i> ĐẶT NGAY</button>
-                </div>
-            </div>
-
-            <!-- TUYẾN SỐ 4 - Hà Nội → Nam Định (18:00) -->
-            <div class="route-card">
-                <div class="route-header"><i class="fas fa-route"></i> TUYẾN SỐ 4</div>
-                <div class="route-body">
-                    <div class="route-points">
-                        <span class="from-to">Hà Nội</span>
-                        <span class="arrow"><i class="fas fa-long-arrow-alt-right"></i></span>
-                        <span class="from-to">Nam Định</span>
-                    </div>
-                    <div class="route-info">
-                        <div class="info-item"><div class="info-label">⏱️ THỜI GIAN</div><div class="info-value">4H</div></div>
-                        <div class="info-item"><div class="info-label">📍 KHOẢNG CÁCH</div><div class="info-value">150KM</div></div>
-                    </div>
-                    <div class="times">
-                        <span class="time-badge"><i class="far fa-clock"></i> 18:00</span>
-                        <span><i class="fas fa-arrow-right"></i></span>
-                        <span class="time-badge"><i class="far fa-clock"></i> 21:00</span>
-                    </div>
-                    <div class="price-section">
-                        <div class="price-label">GIÁ VÉ TỪ</div>
-                        <div class="price-value">150.000 <span class="price-unit">đ</span></div>
-                    </div>
-                    <button class="btn-book"><i class="fas fa-calendar-check"></i> ĐẶT NGAY</button>
-                </div>
-            </div>
-
-            <!-- TUYẾN MỞ RỘNG 5: Hà Nội → Ninh Bình -->
-            <div class="route-card">
-                <div class="route-header"><i class="fas fa-mountain"></i> TUYẾN VIP 5</div>
-                <div class="route-body">
-                    <div class="route-points">
-                        <span class="from-to">Hà Nội</span>
-                        <span class="arrow"><i class="fas fa-long-arrow-alt-right"></i></span>
-                        <span class="from-to">Ninh Bình</span>
-                    </div>
-                    <div class="route-info">
-                        <div class="info-item"><div class="info-label">⏱️ THỜI GIAN</div><div class="info-value">2H30</div></div>
-                        <div class="info-item"><div class="info-label">📍 KHOẢNG CÁCH</div><div class="info-value">110KM</div></div>
-                    </div>
-                    <div class="times">
-                        <span class="time-badge"><i class="far fa-clock"></i> 07:30</span>
-                        <span><i class="fas fa-arrow-right"></i></span>
-                        <span class="time-badge"><i class="far fa-clock"></i> 10:00</span>
-                    </div>
-                    <div class="price-section">
-                        <div class="price-label">GIÁ VÉ TỪ</div>
-                        <div class="price-value">120.000 <span class="price-unit">đ</span></div>
-                    </div>
-                    <button class="btn-book"><i class="fas fa-calendar-check"></i> ĐẶT NGAY</button>
-                </div>
-            </div>
-
-            <!-- TUYẾN MỞ RỘNG 6: Nam Định → Thanh Hóa -->
-            <div class="route-card">
-                <div class="route-header"><i class="fas fa-water"></i> TUYẾN SỐ 6</div>
-                <div class="route-body">
-                    <div class="route-points">
-                        <span class="from-to">Nam Định</span>
-                        <span class="arrow"><i class="fas fa-long-arrow-alt-right"></i></span>
-                        <span class="from-to">Thanh Hóa</span>
-                    </div>
-                    <div class="route-info">
-                        <div class="info-item"><div class="info-label">⏱️ THỜI GIAN</div><div class="info-value">2H</div></div>
-                        <div class="info-item"><div class="info-label">📍 KHOẢNG CÁCH</div><div class="info-value">85KM</div></div>
-                    </div>
-                    <div class="times">
-                        <span class="time-badge"><i class="far fa-clock"></i> 09:00</span>
-                        <span><i class="fas fa-arrow-right"></i></span>
-                        <span class="time-badge"><i class="far fa-clock"></i> 11:00</span>
-                    </div>
-                    <div class="price-section">
-                        <div class="price-label">GIÁ VÉ TỪ</div>
-                        <div class="price-value">90.000 <span class="price-unit">đ</span></div>
-                    </div>
-                    <button class="btn-book"><i class="fas fa-calendar-check"></i> ĐẶT NGAY</button>
+            <div class="route-body">
+                <div class="route-points" style="justify-content:center;">
+                    <span class="from-to">Hiện chưa có dữ liệu tuyến xe trong hệ thống.</span>
                 </div>
             </div>
         </div>
+    @endforelse
+</div>
 
+<script>
+function bookRoute(routeId) {
+    window.location.href = "{{ url('/booking') }}/" + routeId;
+}
+</script>
         <!-- KHU VỰC KHUYẾN MÃI & PHẢN HỒI -->
         <div class="promo-block">
             <div class="testimonial-text">

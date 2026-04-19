@@ -3,20 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use App\Models\TaiKhoan;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
     public function showLoginForm()
     {
-        // Kiểm tra xem file có tồn tại không
-        if (!view()->exists('login')) {
-            // Nếu không tìm thấy, thử với đường dẫn auth.login
-            return view('auth.login');
-        }
-
-        return view('login');
+        // Vì file nằm trong thư mục auth
+        return view('auth.login');
     }
 
     public function login(Request $request)
@@ -29,10 +25,11 @@ class LoginController extends Controller
         $phone = trim($request->phone);
         $password = $request->password;
 
-        // Admin hardcoded
+        // Admin hardcoded (tạm thời cho phát triển)
         if ($phone === 'admin' && $password === '12345678') {
             session([
                 'isAdmin' => true,
+                'userRole' => 'admin',
                 'userPhone' => 'admin',
                 'userName' => 'Quản trị viên',
                 'isLoggedIn' => true,
@@ -40,45 +37,42 @@ class LoginController extends Controller
             return redirect()->intended('/admin');
         }
 
-        // Kiểm tra với Supabase
         try {
-            $response = Http::withHeaders([
-                'apikey' => env('SUPABASE_ANON_KEY'),
-                'Authorization' => 'Bearer ' . env('SUPABASE_ANON_KEY'),
-            ])->get(env('SUPABASE_URL') . '/rest/v1/taiKhoan', [
-                'username' => 'eq.' . $phone,
-                'select' => '*',
-            ]);
+            // Tìm user theo số điện thoại
+            $user = User::where('phone', $phone)->first();
 
-            if ($response->successful()) {
-                $users = $response->json();
+            if (!$user) {
+                return back()->withErrors(['Số điện thoại chưa được đăng ký!'])->withInput();
+            }
 
-                if (empty($users)) {
-                    return back()->withErrors(['Số điện thoại chưa được đăng ký!'])->withInput();
-                }
-
-                $user = $users[0];
-
-                if ($user['password'] === $password) {
-                    session([
-                        'isAdmin' => ($user['role'] ?? 'user') === 'admin',
-                        'userPhone' => $phone,
-                        'userName' => $user['fullName'] ?? 'Khách hàng',
-                        'userId' => $user['id'] ?? null,
-                        'isLoggedIn' => true,
-                    ]);
-
-                    return redirect()->intended('/');
-                }
-
+            // Kiểm tra mật khẩu
+            if ($user->password !== $password) {
                 return back()->withErrors(['Mật khẩu không chính xác!'])->withInput();
             }
 
-            Log::error('Supabase error: ' . $response->body());
-            return back()->withErrors(['Lỗi kết nối hệ thống. Vui lòng thử lại!'])->withInput();
+            $role = $user->role ?? 'khach_hang';
+
+            // Lưu session
+            session([
+                'isAdmin' => $role === 'admin',
+                'userRole' => $role,
+                'userPhone' => $user->phone,
+                'userName' => $user->full_name ?? $user->phone,
+                'userFullName' => $user->full_name,
+                'userId' => $user->id,
+                'isLoggedIn' => true,
+            ]);
+
+            // Chuyển hướng theo role
+            if ($role === 'admin') {
+                return redirect()->intended('/admin');
+            }
+
+            // Tài xế và khách hàng đều về trang chủ
+            return redirect()->intended('/');
         } catch (\Exception $e) {
             Log::error('Login exception: ' . $e->getMessage());
-            return back()->withErrors(['Lỗi kết nối hệ thống. Vui lòng thử lại!'])->withInput();
+            return back()->withErrors(['Lỗi hệ thống, vui lòng thử lại sau!'])->withInput();
         }
     }
 

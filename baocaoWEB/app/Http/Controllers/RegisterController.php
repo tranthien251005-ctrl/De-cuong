@@ -3,89 +3,55 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
 
 class RegisterController extends Controller
 {
     public function showRegisterForm()
     {
-        // Kiểm tra xem file có tồn tại không
-        if (!view()->exists('register')) {
-            // Nếu không tìm thấy, thử với đường dẫn auth.login
-            return view('auth.register');
-        }
+        return view('auth.register');
     }
+
     public function register(Request $request)
     {
         // Validate input
         $request->validate([
-            'fullName' => 'required|string|min:3|max:255',
-            'phone' => 'required|string|regex:/^(0[3|5|7|8|9])+([0-9]{8})$/',
-            'email' => 'nullable|email|max:255',
+            'full_name' => 'required|string|min:3|max:255',
+            'phone' => 'required|string|regex:/^0[0-9]{9}$/|unique:users,phone',
+            'email' => 'nullable|email|max:255|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
         ], [
-            'fullName.required' => 'Vui lòng nhập họ và tên',
-            'fullName.min' => 'Họ và tên phải có ít nhất 3 ký tự',
+            'full_name.required' => 'Vui lòng nhập họ và tên',
+            'full_name.min' => 'Họ và tên phải có ít nhất 3 ký tự',
             'phone.required' => 'Vui lòng nhập số điện thoại',
-            'phone.regex' => 'Số điện thoại không hợp lệ',
+            'phone.regex' => 'Số điện thoại không hợp lệ (phải bắt đầu bằng 03, 05, 07, 08, 09 và có 10 số)',
+            'phone.unique' => 'Số điện thoại đã được đăng ký',
+            'email.email' => 'Email không hợp lệ',
+            'email.unique' => 'Email đã được đăng ký',
             'password.required' => 'Vui lòng nhập mật khẩu',
             'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự',
             'password.confirmed' => 'Mật khẩu xác nhận không khớp',
         ]);
 
         try {
-            $supabaseUrl = env('SUPABASE_URL');
-            $supabaseKey = env('SUPABASE_ANON_KEY');
-
-            if (!$supabaseUrl || !$supabaseKey) {
-                Log::error('Supabase configuration missing');
-                return back()->withErrors(['Lỗi cấu hình hệ thống. Vui lòng liên hệ quản trị viên!'])->withInput();
-            }
-
-            // Kiểm tra số điện thoại đã tồn tại chưa
-            $checkResponse = Http::withHeaders([
-                'apikey' => $supabaseKey,
-                'Authorization' => 'Bearer ' . $supabaseKey,
-            ])->get($supabaseUrl . '/rest/v1/taiKhoan', [
-                'username' => 'eq.' . $request->phone,
-                'select' => 'username',
-            ]);
-
-            if ($checkResponse->successful() && !empty($checkResponse->json())) {
-                return back()->withErrors(['Số điện thoại này đã được đăng ký!'])->withInput();
-            }
-
-            // Tạo user mới
-            $response = Http::withHeaders([
-                'apikey' => $supabaseKey,
-                'Authorization' => 'Bearer ' . $supabaseKey,
-                'Content-Type' => 'application/json',
-                'Prefer' => 'return=minimal',
-            ])->post($supabaseUrl . '/rest/v1/taiKhoan', [
-                'username' => $request->phone,
-                'password' => $request->password,
-                'fullName' => $request->fullName,
+            // Tạo user mới trong bảng users
+            $user = User::create([
+                'full_name' => $request->full_name,
+                'phone' => $request->phone,
                 'email' => $request->email,
-                'role' => 'user',
-                'created_at' => now()->toDateTimeString(),
+                'password' => $request->password,
+                'role' => 'khach_hang',
             ]);
 
-            if ($response->successful()) {
+            if ($user) {
                 return redirect()->route('login')->with('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
             }
 
-            $errorBody = $response->body();
-            Log::error('Register error: ' . $errorBody);
-
-            if ($response->status() === 409) {
-                return back()->withErrors(['Số điện thoại đã tồn tại trong hệ thống!'])->withInput();
-            }
-
-            return back()->withErrors(['Đăng ký thất bại. Vui lòng thử lại sau!'])->withInput();
+            return back()->withErrors(['Đăng ký thất bại. Vui lòng thử lại!'])->withInput();
         } catch (\Exception $e) {
             Log::error('Register exception: ' . $e->getMessage());
-            return back()->withErrors(['Lỗi kết nối hệ thống. Vui lòng thử lại sau!'])->withInput();
+            return back()->withErrors(['Lỗi hệ thống: ' . $e->getMessage()])->withInput();
         }
     }
 }

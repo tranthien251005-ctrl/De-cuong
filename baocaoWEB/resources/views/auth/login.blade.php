@@ -55,14 +55,17 @@
 
                         <div class="input-group">
                             <label for="password">Mật khẩu</label>
-                            <input 
-                                type="password" 
-                                id="password"
-                                name="password"
-                                placeholder="Nhập mật khẩu" 
-                                autocomplete="current-password"
-                                required
-                            >
+                            <div class="password-wrapper">
+                                <input 
+                                    type="password" 
+                                    id="password"
+                                    name="password"
+                                    placeholder="Nhập mật khẩu" 
+                                    autocomplete="current-password"
+                                    required
+                                >
+                                <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                            </div>
                             <div class="forgot-password">
                                 <a href="{{ route('password.request') }}">Quên mật khẩu?</a>
                             </div>
@@ -84,6 +87,9 @@
     
     {{-- Footer cố định dưới cùng --}}
     @include('pages.footer')
+
+    {{-- Script riêng --}}
+    <script src="{{ asset('js/login.js') }}"></script>
 
 </body>
 </html>

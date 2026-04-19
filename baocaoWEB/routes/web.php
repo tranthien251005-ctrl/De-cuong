@@ -4,8 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\HomeController;
+use App\Models\TaiKhoan;
+use App\Models\User;
 
-Route::get('/', function () {
+// Public routes
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/welcome', function () {
     return view('welcome');
 });
 
@@ -18,7 +24,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
 
-// Password Reset Routes (nếu có)
+// Password Reset Routes
 Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
 })->name('password.request');
@@ -27,12 +33,8 @@ Route::get('/byticket', function () {
     return view('layouts.byticket');
 })->name('byticket');
 
-Route::get('/byticket', function () {
-    return view('layouts/byticket');
-});
-
-// Admin Routes
-Route::prefix('admin')->middleware(['admin'])->group(function () {
+// ========== ADMIN ROUTES - Chỉ admin mới vào được ==========
+Route::prefix('admin')->middleware(['role:admin'])->group(function () {
     // Dashboard
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
@@ -66,4 +68,39 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
     // Settings
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+});
+
+// ========== USER ROUTES - Tất cả user đã đăng nhập (admin, tai_xe, khach_hang) ==========
+Route::middleware(['role:admin,tai_xe,khach_hang'])->group(function () {
+    Route::get('/profile', function () {
+        return view('profile');
+    })->name('profile');
+
+    Route::get('/booking', function () {
+        return view('booking');
+    })->name('booking');
+
+    Route::get('/my-tickets', function () {
+        return view('my-tickets');
+    })->name('my-tickets');
+});
+
+// ========== TEST ROUTE ==========
+Route::get('/test-model', function () {
+    try {
+        $allUsers = User::all();
+        $users = User::limit(5)->get();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Kết nối thành công!',
+            'total' => $allUsers->count(),
+            'data' => $users
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Lỗi: ' . $e->getMessage()
+        ], 500);
+    }
 });

@@ -270,6 +270,27 @@ body {
     color: #94a3b8;
 }
 
+.password-wrapper {
+    position: relative;
+}
+.password-wrapper input {
+    width: 100%;
+    padding-right: 45px; /* Tạo khoảng trống cho icon */
+}
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #9ca3af;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+.toggle-password:hover {
+    color: #0f766e; /* Màu xanh khi hover */
+}
+
 /* ========== XỬ LÝ ZOOM ========== */
 /* Khi zoom nhỏ lại (thu nhỏ trình duyệt) */
 @media screen and (max-width: 600px) {

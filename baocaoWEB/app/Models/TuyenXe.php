@@ -11,7 +11,8 @@ class TuyenXe extends Model
     protected $primaryKey = 'matuyen';
     public $incrementing = true;
     protected $keyType = 'int';
-    
+    public $timestamps = false;
+
     protected $fillable = [
         'tentuyen',
         'diemdi',
@@ -23,30 +24,29 @@ class TuyenXe extends Model
         'giatien',
         'maxe',
     ];
-    
-    // Quan hệ: một tuyến xe thuộc về một xe
+
     public function xe()
     {
         return $this->belongsTo(Xe::class, 'maxe', 'maxe');
     }
-    
-    // Lấy biển số xe
+
     public function getBienSoXeAttribute()
     {
         if (!$this->maxe) {
             return 'Chưa cập nhật';
         }
-        
+
         $xe = DB::table('xe')->where('maxe', $this->maxe)->first();
         return $xe ? $xe->biensoxe : 'Không tìm thấy';
     }
-    
-    // Lấy danh sách ghế
+
     public function getGhesAttribute()
     {
         if (!$this->maxe) {
             return collect([]);
         }
+
         return Ghe::where('maxe', $this->maxe)->get();
     }
 }
+

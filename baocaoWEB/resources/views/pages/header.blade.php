@@ -35,11 +35,10 @@
         padding: 10px 0;
     }
 
-    /* Phần bên trái: logo + navbar */
     .left-section {
         display: flex;
         align-items: center;
-        gap: 30px; /* Khoảng cách giữa logo và navbar */
+        gap: 30px;
     }
 
     .logo {
@@ -74,7 +73,6 @@
         color: #0f766e;
     }
 
-    /* Phần bên phải: user actions */
     .user-actions {
         display: flex;
         align-items: center;
@@ -129,7 +127,6 @@
 
 <header class="main-header">
     <div class="container-header">
-        {{-- PHẦN BÊN TRÁI: LOGO + NAVBAR --}}
         <div class="left-section">
             <div class="logo">
                 <h1>🚌 CHÚ THIỆN</h1>
@@ -138,12 +135,12 @@
             <nav class="navbar">
                 <ul>
                     <li><a href="{{ route('home') }}">Trang chủ</a></li>
+                    <li><a href="{{ route('home') }}#routes">Đặt vé</a></li>
                     <li><a href="{{ route('bill') }}">Hóa đơn</a></li>
                 </ul>
             </nav>
         </div>
 
-        {{-- PHẦN BÊN PHẢI: USER ACTIONS --}}
         <div class="user-actions">
             @if(session('isLoggedIn'))
                 <div class="user-menu">
@@ -163,3 +160,4 @@
         </div>
     </div>
 </header>
+

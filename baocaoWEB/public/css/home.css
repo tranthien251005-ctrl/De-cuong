@@ -66,6 +66,29 @@ body {
     letter-spacing: -0.02em;
     margin-bottom: 1rem;
 }
+        .hero-content p {
+            font-size: 1.2rem;
+            color: #eef5ff;
+            max-width: 620px;
+            margin: 0 auto;
+            font-weight: 500;
+        }
+        
+        /* search banner chỉ mang tính giao diện, không xử lý */
+        .search-banner {
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 0.6rem;
+            margin-top: 2.2rem;
+            display: inline-flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            border: 1px solid rgba(255, 245, 200, 0.4);
+            max-width: 750px;
+            width: 100%;
+        }
 
 .hero-content p {
     font-size: 1.2rem;

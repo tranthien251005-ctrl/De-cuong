@@ -47,3 +47,4 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
     Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
 });
+

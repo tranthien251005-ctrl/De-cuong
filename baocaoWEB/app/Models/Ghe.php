@@ -8,16 +8,17 @@ class Ghe extends Model
 {
     protected $table = 'vitrighe';
     protected $primaryKey = 'maghe';
-    
+    public $timestamps = false;
+
     protected $fillable = [
         'tenghe',
         'trangthai',
         'maxe',
     ];
-    
-    // Quan hệ: một ghế thuộc về một xe
+
     public function xe()
     {
         return $this->belongsTo(Xe::class, 'maxe', 'maxe');
     }
 }
+

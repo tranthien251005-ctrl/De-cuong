@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class TaiKhoan extends Model
 {
-    protected $table = 'users';
+    protected $table = 'taikhoan';
     protected $primaryKey = 'id';
     public $timestamps = false;
 
@@ -15,6 +15,7 @@ class User extends Model
         'password',
         'role',
         'email',
+        'hoten',
     ];
 
     protected $hidden = [
@@ -23,7 +24,5 @@ class User extends Model
 
     protected $casts = [
         'id' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 }

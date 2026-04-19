@@ -1,260 +1,159 @@
 ﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>MY BUS · Đặt vé trực tuyến</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <meta charset="UTF-8">
+    <title>MY BUS - Đặt vé</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/byticket.css') }}">
 </head>
 <body>
-@include('pages.header')
-<div class="page-wrapper">
-    <div class="booking-card">
-        <!-- Form tìm kiếm với select điểm đi / điểm đến đã cập nhật theo yêu cầu -->
-        <div class="search-banner">
-            <div class="field-group">
-                <label><i class="fas fa-map-marker-alt"></i> Điểm đi</label>
-                <select id="fromPlace" name="from">
-                    <option value="">Chọn điểm đi</option>
-                    <option value="Hà Nội">Hà Nội</option>
-                    <option value="Nam Định">Nam Định</option>
-                    <option value="Ninh Bình">Ninh Bình</option>
-                    <option value="Thanh Hóa">Thanh Hóa</option>
-                    <option value="Hải Phòng">Hải Phòng</option>
-                </select>
+    @include('pages.header')
+    
+    <div class="page-wrapper">
+        <div class="booking-card">
+            <div class="route-info-banner">
+                <div class="route-title">
+                    <i class="fas fa-bus-alt"></i>
+                    <span>{{ $tuyen->tentuyen ?? 'Tuyến xe' }}</span>
+                </div>
+                <div class="route-details">
+                    <span><i class="fas fa-map-marker-alt"></i> Điểm đi: <strong>{{ $tuyen->diemdi ?? '--' }}</strong></span>
+                    <span><i class="fas fa-flag-checkered"></i> Điểm đến: <strong>{{ $tuyen->diemden ?? '--' }}</strong></span>
+                </div>
             </div>
-
-            <div class="field-group">
-                <label><i class="fas fa-flag-checkered"></i> Điểm đến</label>
-                <select id="toPlace" name="to">
-                    <option value="">Chọn điểm đến</option>
-                    <option value="Hà Nội">Hà Nội</option>
-                    <option value="Nam Định">Nam Định</option>
-                    <option value="Ninh Bình">Ninh Bình</option>
-                    <option value="Thanh Hóa">Thanh Hóa</option>
-                    <option value="Hải Phòng">Hải Phòng</option>
-                </select>
+            
+            <div class="date-selector">
+                <span><i class="far fa-calendar-alt"></i> Chọn ngày khởi hành:</span>
+                <input type="date" id="travelDate" class="date-input">
             </div>
-
-            <div class="field-group">
-                <label><i class="far fa-calendar-alt"></i> Ngày đi</label>
-                <input type="date" id="travelDate" name="date" />
-            </div>
-
-            <button class="btn-primary" id="searchBtn"><i class="fas fa-search"></i> Tìm chuyến</button>
-        </div>
-
-        <!-- KẾT QUẢ + GHẾ + TÓM TẮT -->
-        <div class="result-section">
-            <!-- cột trái: thông tin chuyến & ghế -->
-            <div>
-                <div class="trip-detail">
-                    <div class="trip-header">
-                        <div class="trip-time">07:05 <i class="fas fa-arrow-right"></i> 11:00</div>
-                        <div class="station-badge"><i class="fas fa-building"></i> BX Ô Môn</div>
-                    </div>
-                    <div class="route-highlight">
-                        <div class="route-info-stack">
-                            <strong>📅 Ngày khởi hành: <span id="displayDateHeader">--/--/----</span></strong>
-                            <span>🕒 Thời gian trung bình: 4 giờ 0 phút</span>
-                            <span>📍 Quãng đường: 160km</span>
+            
+            <div class="result-section">
+                <div>
+                    <div class="trip-detail">
+                        <div class="trip-time">
+                            {{ isset($tuyen->giodi) ? \Carbon\Carbon::parse($tuyen->giodi)->format('H:i') : '--:--' }}
+                            <i class="fas fa-arrow-right"></i>
+                            {{ isset($tuyen->gioden) ? \Carbon\Carbon::parse($tuyen->gioden)->format('H:i') : '--:--' }}
                         </div>
-                        <div class="select-badge"><i class="fas fa-exchange-alt"></i></div>
-                    </div>
-
-                    <!-- Khu vực chọn ghế hiện đại -->
-                    <div class="seat-area">
-                        <h4><i class="fas fa-couch"></i> Sơ đồ ghế (chọn ghế trống)</h4>
-                        <div class="seat-grid" id="seatContainer">
-                            <!-- ghế sẽ được tạo bằng js -->
+                        
+                        <div class="route-highlight">
+                            <div class="route-info-stack">
+                                <strong>📅 Ngày khởi hành: <span id="displayDateHeader">--/--/----</span></strong>
+                                <span>🕒 Thời gian: {{ $tuyen->thoigiandukien ?? '--' }}</span>
+                                <span>📍 Quãng đường: {{ $tuyen->khoangcach ?? '--' }} km</span>
+                            </div>
                         </div>
-                        <div class="legend">
-                            <span><span class="legend-dot" style="background:#eff6ff; border:1px solid #dce5f0;"></span> Trống</span>
-                            <span><span class="legend-dot" style="background:#f39c12;"></span> Đang chọn</span>
-                            <span><span class="legend-dot" style="background:#eef2f6; border:1px solid #cbd5e1;"></span> Đã đặt</span>
+                        
+                        <div class="seat-area">
+                            <h4><i class="fas fa-couch" style="padding-bottom: 20px;"></i> Sơ đồ ghế (chọn ghế trống)</h4>
+                            <div class="seat-grid" id="seatContainer">
+                                @foreach($ghes as $ghe)
+                                    <div class="seat {{ $ghe->trangthai == 'da_dat' ? 'booked' : 'available' }}" data-seat-id="{{ $ghe->maghe }}">
+                                        {{ $ghe->tenghe }}
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="legend">
+                                <span><span class="legend-dot" style="background: #eff6ff;"></span> Trống</span>
+                                <span><span class="legend-dot" style="background: #f39c12;"></span> Đang chọn</span>
+                                <span><span class="legend-dot" style="background: rgba(220, 53, 69, 0.65);"></span> Đã đặt</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- sidebar tổng kết đơn hàng -->
-            <div class="summary-card" id="summaryBox">
-                <h3><i class="fas fa-receipt"></i> Thông tin đặt vé</h3>
-                <div class="info-row"><span>Tuyến:</span><span><strong id="routeName">-- → --</strong></span></div>
-                <div class="info-row"><span>Ngày đi:</span><span id="displayDate">--/--/----</span></div>
-                <div class="info-row"><span>Ghế đã chọn:</span><span id="selectedSeatsLabel">Chưa có ghế</span></div>
-                <div class="info-row"><span>Biển số xe:</span><span>65D1-50354</span></div>
-                <div class="info-row"><span>Đơn giá / vé:</span><span><strong>150.000đ</strong></span></div>
-                <div class="total-price" id="totalPriceDisplay">0đ</div>
-                <button type="button" class="btn-book-final" id="bookNowBtn"><i class="fas fa-check-circle"></i> ĐẶT VÉ NGAY</button>
-                <p style="font-size: 11px; margin-top: 12px; color:#6c86a3;"><i class="fas fa-shield-alt"></i> Hoàn vé linh hoạt · Thanh toán an toàn</p>
+                
+                <div class="summary-card">
+                    <h3><i class="fas fa-receipt"></i> Thông tin đặt vé</h3>
+                    <div class="info-row"><span>Tuyến:</span><span><strong>{{ $tuyen->diemdi ?? '--' }} → {{ $tuyen->diemden ?? '--' }}</strong></span></div>
+                    <div class="info-row"><span>Ngày đi:</span><span id="displayDate">--/--/----</span></div>
+                    <div class="info-row"><span>Ghế đã chọn:</span><span id="selectedSeatsLabel">Chưa có ghế</span></div>
+                    <div class="info-row"><span>Biển số xe:</span><span>{{ $tuyen->bienSoXe ?? '--' }}</span></div>
+                    <div class="info-row"><span>Đơn giá / vé:</span><span><strong>{{ number_format($tuyen->giatien ?? 0, 0, ',', '.') }}.000 vnđ</strong></span></div>
+                    <div class="total-price" id="totalPriceDisplay">0vnđ</div>
+                    <button class="btn-book-final" id="bookNowBtn"><i class="fas fa-check-circle"></i> ĐẶT VÉ NGAY</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-@include('pages.footer')
-<script>
-    // === KHỞI TẠO DỮ LIỆU GHẾ VÀ TÍNH NĂNG CHỌN (UI THUẦN) ===
-    const paymentPageUrl = @json(route('payment'));
-    const seatLabels = ['A01','A02','A03','A04','A05','B01','B02','B03','B04','B05','C01','C02','C03','C04','C05','D01','D02','D03','D04','D05'];
-    // 20 ghế, một số ghế booked (demo)
-    let seatStatus = {
-        'A03': 'booked',
-        'B04': 'booked',
-        'C02': 'booked',
-        'D05': 'booked'
-    };
-    let selectedSeats = []; // lưu tên ghế đang chọn
-
-    function renderSeats() {
-        const container = document.getElementById('seatContainer');
-        if (!container) return;
-        container.innerHTML = '';
-        seatLabels.forEach(label => {
-            let status = seatStatus[label] || 'available';
-            let isSelected = selectedSeats.includes(label);
-            if (isSelected) status = 'selected';
-            const seatDiv = document.createElement('div');
-            seatDiv.className = `seat ${status}`;
-            seatDiv.innerText = label;
-            if (status !== 'booked') {
-                seatDiv.style.cursor = 'pointer';
-                seatDiv.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (seatStatus[label] === 'booked') return;
-                    if (selectedSeats.includes(label)) {
-                        selectedSeats = selectedSeats.filter(s => s !== label);
+    
+    @include('pages.footer')
+    
+    <script>
+        let selectedSeats = [];
+        let pricePerTicket = {{ $tuyen->giatien ?? 150000 }};
+        
+        function initSeatEvents() {
+            document.querySelectorAll('.seat:not(.booked)').forEach(seat => {
+                seat.style.cursor = 'pointer';
+                seat.addEventListener('click', function() {
+                    const seatName = this.innerText;
+                    
+                    if (this.classList.contains('selected')) {
+                        this.classList.remove('selected');
+                        selectedSeats = selectedSeats.filter(s => s !== seatName);
                     } else {
-                        selectedSeats.push(label);
+                        this.classList.add('selected');
+                        selectedSeats.push(seatName);
                     }
-                    renderSeats();
                     updateSummary();
                 });
-            } else {
-                seatDiv.style.cursor = 'not-allowed';
-            }
-            container.appendChild(seatDiv);
-        });
-    }
-
-    function updateSummary() {
-        const selectedCount = selectedSeats.length;
-        const pricePerTicket = 150000;
-        const total = selectedCount * pricePerTicket;
-        document.getElementById('selectedSeatsLabel').innerText = selectedCount === 0 ? 'Chưa có ghế' : selectedSeats.join(', ');
-        document.getElementById('totalPriceDisplay').innerHTML = total.toLocaleString('vi-VN') + 'đ';
-        const bookBtn = document.getElementById('bookNowBtn');
-        bookBtn.disabled = selectedCount === 0;
-        bookBtn.style.opacity = selectedCount === 0 ? '0.7' : '1';
-        bookBtn.style.cursor = selectedCount === 0 ? 'not-allowed' : 'pointer';
-    }
-
-    // Cập nhật ngày hiện tại và min date (không cho chọn quá khứ)
-    const dateInput = document.getElementById('travelDate');
-    const today = new Date().toISOString().split('T')[0];
-    if (dateInput) {
-        dateInput.value = today;
-        dateInput.setAttribute('min', today);
-    }
-
-    // hiển thị ngày lên sidebar và header
-    function updateDateDisplay() {
-        const dateVal = document.getElementById('travelDate').value;
-        if (dateVal) {
-            const formatted = new Date(dateVal).toLocaleDateString('vi-VN');
-            document.getElementById('displayDate').innerText = formatted;
-            const headerDateElem = document.getElementById('displayDateHeader');
-            if (headerDateElem) headerDateElem.innerText = formatted;
-        } else {
-            document.getElementById('displayDate').innerText = 'Chưa chọn';
-            const headerDateElem = document.getElementById('displayDateHeader');
-            if (headerDateElem) headerDateElem.innerText = '--/--/----';
+            });
         }
-    }
-    if (dateInput) {
-        dateInput.addEventListener('change', updateDateDisplay);
-        updateDateDisplay();
-    }
-
-    // Cập nhật tên tuyến theo điểm đi/đến (từ select đã cập nhật)
-    function updateRouteName() {
-        const fromSelect = document.getElementById('fromPlace');
-        const toSelect = document.getElementById('toPlace');
-        let fromText = fromSelect.options[fromSelect.selectedIndex]?.value;
-        let toText = toSelect.options[toSelect.selectedIndex]?.value;
-        if (!fromText) fromText = '?';
-        if (!toText) toText = '?';
-        document.getElementById('routeName').innerText = `${fromText} → ${toText}`;
-    }
-    const fromSelect = document.getElementById('fromPlace');
-    const toSelect = document.getElementById('toPlace');
-    if (fromSelect && toSelect) {
-        fromSelect.addEventListener('change', updateRouteName);
-        toSelect.addEventListener('change', updateRouteName);
-        updateRouteName();
-    }
-
-    // nút tìm kiếm: cập nhật tuyến và reset ghế
-    document.getElementById('searchBtn')?.addEventListener('click', () => {
-        // reset chọn ghế
-        selectedSeats = [];
-        renderSeats();
-        updateSummary();
-        updateRouteName();
-        updateDateDisplay();
         
-        const fromVal = fromSelect.options[fromSelect.selectedIndex]?.value;
-        const toVal = toSelect.options[toSelect.selectedIndex]?.value;
-        if (!fromVal || !toVal) {
-            alert('🔍 Vui lòng chọn đầy đủ điểm đi và điểm đến!');
-        } else {
-            alert(`🔍 Đã tìm chuyến xe từ ${fromVal} → ${toVal}. Vui lòng chọn ghế.`);
+        function updateSummary() {
+            const selectedCount = selectedSeats.length;
+            const total = selectedCount * pricePerTicket;
+            
+            if (selectedCount === 0) {
+                document.getElementById('selectedSeatsLabel').innerText = 'Chưa có ghế';
+            } else {
+                document.getElementById('selectedSeatsLabel').innerText = 'Ghế ' + selectedSeats.join(', Ghế ');
+            }
+            
+            document.getElementById('totalPriceDisplay').innerHTML = total.toLocaleString('vi-VN') + '.000vnđ';
         }
-    });
+        
+        // Khởi tạo ngày
+        const dateInput = document.getElementById('travelDate');
+        const today = new Date().toISOString().split('T')[0];
+        if (dateInput) {
+            dateInput.value = today;
+            dateInput.setAttribute('min', today);
+        }
+        
+        function updateDateDisplay() {
+            const dateVal = document.getElementById('travelDate').value;
+            if (dateVal) {
+                const formatted = new Date(dateVal).toLocaleDateString('vi-VN');
+                document.getElementById('displayDate').innerText = formatted;
+                document.getElementById('displayDateHeader').innerText = formatted;
+            }
+        }
+        
+        if (dateInput) {
+            dateInput.addEventListener('change', updateDateDisplay);
+            updateDateDisplay();
+        }
+        
+        // Nút đặt vé
+        document.getElementById('bookNowBtn').addEventListener('click', function() {
+            if (selectedSeats.length === 0) {
+                alert('Vui lòng chọn ghế trước khi đặt vé!');
+                return;
+            }
 
-    // đặt vé
-    document.getElementById('bookNowBtn')?.addEventListener('click', () => {
-        const date = document.getElementById('travelDate').value;
-        const from = fromSelect.options[fromSelect.selectedIndex]?.value || '?';
-        const to = toSelect.options[toSelect.selectedIndex]?.value || '?';
-        const formattedDate = date ? new Date(date).toLocaleDateString('vi-VN') : 'Chưa rõ';
-        const totalAmount = selectedSeats.length * 150000;
-        const now = new Date();
-        const ticketCode = `VE-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
-        const query = new URLSearchParams({
-            from,
-            to,
-            date: formattedDate,
-            seats: selectedSeats.join(', '),
-            ticketCode,
-            total: totalAmount.toLocaleString('vi-VN') + ' VND'
+            const travelDate = document.getElementById('travelDate')?.value || '';
+            const seats = encodeURIComponent(selectedSeats.join(','));
+            const date = encodeURIComponent(travelDate);
+
+            window.location.href = "{{ url('/payment') }}/{{ $tuyen->matuyen ?? '' }}?seats=" + seats + "&date=" + date;
         });
-
-        fetch(paymentPageUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({
-                from,
-                to,
-                date: formattedDate,
-                seats: selectedSeats.join(', '),
-                ticketCode,
-                total: totalAmount
-            })
-        }).then(() => {
-            window.location.href = paymentPageUrl;
+        
+        // Khởi tạo
+        document.addEventListener('DOMContentLoaded', function() {
+            initSeatEvents();
         });
-    });
-
-    // khởi tạo giao diện ghế
-    renderSeats();
-    updateSummary();
-</script>
+    </script>
 </body>
 </html>
-

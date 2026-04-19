@@ -17,46 +17,51 @@
 <div class="main-wrapper">
     <!-- PHẦN HERO BẮT MẮT -->
     <div class="hero">
-        <div class="hero-content">
-            <h1><i class="fas fa-bus-alt"></i> HÀNH TRÌNH TIẾP THEO CỦA BẠN</h1>
-            <p>Đặt vé trực tuyến nhanh chóng, an toàn và tiện lợi nhất cùng MY BUS — Trải nghiệm di chuyển đẳng cấp</p>
-            
-            <!-- Form tìm kiếm -->
-            <div class="search-banner">
-                <select id="fromPlace" name="from">
-                    <option value="">📍 Chọn điểm đi</option>
-                    <option value="Ha Noi">Hà Nội</option>
-                    <option value="Nam Dinh">Nam Định</option>
-                    <option value="Ninh Binh">Ninh Bình</option>
-                    <option value="Thanh Hoa">Thanh Hóa</option>
-                    <option value="Hai Phong">Hải Phòng</option>
-                </select>
+    <div class="hero-content">
+        <h1><i class="fas fa-bus-alt"></i> HÀNH TRÌNH TIẾP THEO CỦA BẠN</h1>
+        <p>Đặt vé trực tuyến nhanh chóng, an toàn và tiện lợi nhất cùng MY BUS — Trải nghiệm di chuyển đẳng cấp</p>
+        <form method="GET" action="{{ url('/') }}" class="search-banner">
+            <select name="from">
+                <option value="">📍 Chọn điểm đi</option>
+                @foreach($tuyenXes as $tuyen)
+                    <option value="{{ $tuyen->diemdi }}" {{ request('from') == $tuyen->diemdi ? 'selected' : '' }}>
+                        {{ $tuyen->diemdi }}
+                    </option>
+                @endforeach
+            </select>
 
-                <select id="toPlace" name="to">
-                    <option value="">📍 Chọn điểm đến</option>
-                    <option value="Ha Noi">Hà Nội</option>
-                    <option value="Nam Dinh">Nam Định</option>
-                    <option value="Ninh Binh">Ninh Bình</option>
-                    <option value="Thanh Hoa">Thanh Hóa</option>
-                    <option value="Hai Phong">Hải Phòng</option>
-                </select>
+            <select name="to">
+                <option value="">📍 Chọn điểm đến</option>
+                @foreach($tuyenXes as $tuyen)
+                    <option value="{{ $tuyen->diemden }}" {{ request('to') == $tuyen->diemden ? 'selected' : '' }}>
+                        {{ $tuyen->diemden }}
+                    </option>
+                @endforeach
+            </select>
 
-                <input type="date" id="travelDate" name="date">
-                
-                <button type="button"><i class="fas fa-search"></i> Tìm chuyến</button>
-            </div>
+            <select name="time">
+                <option value="">⏰ Giờ đi</option>
+                @foreach($tuyenXes as $tuyen)
+                    <option value="{{ $tuyen->giodi }}" {{ request('time') == $tuyen->giodi ? 'selected' : '' }}>
+                        {{ \Carbon\Carbon::parse($tuyen->giodi)->format('H:i') }}
+                    </option>
+                @endforeach
+            </select>
 
-            <!-- Thống kê trang trí -->
-            <div class="stats-row">
-                <div class="stat-card"><div class="stat-number">⭐ 4.9</div><div class="stat-label">Đánh giá từ khách</div></div>
-                <div class="stat-card"><div class="stat-number">🚌 120+</div><div class="stat-label">Chuyến xe mỗi ngày</div></div>
-                <div class="stat-card"><div class="stat-number">💺 98%</div><div class="stat-label">Đúng giờ</div></div>
-            </div>
+            <button type="submit"><i class="fas fa-search"></i> Tìm chuyến</button>
+        </form>
+
+        <!-- Thống kê trang trí -->
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-number">⭐ 4.9</div><div class="stat-label">Đánh giá từ khách</div></div>
+            <div class="stat-card"><div class="stat-number">🚌 120+</div><div class="stat-label">Chuyến xe mỗi ngày</div></div>
+            <div class="stat-card"><div class="stat-number">💺 98%</div><div class="stat-label">Đúng giờ</div></div>
         </div>
     </div>
+</div>
 
-    <!-- NỘI DUNG CHÍNH: DANH SÁCH TUYẾN XE -->
-    <div class="main-container">
+<!-- NỘI DUNG CHÍNH: DANH SÁCH TUYẾN XE -->
+<div class="main-container" id="routes">
     <div class="page-title">
         <i class="fas fa-map-marked-alt"></i>
         🚍 DANH SÁCH TUYỂN XE TRỰC TUYẾN
@@ -88,7 +93,7 @@
                 </div>
                 
                 <div class="times">
-                    <span class="time-badge"> 
+                    <span class="time-badge">
                         <i class="far fa-clock"></i>
                         {{ $tuyen->giodi ? \Carbon\Carbon::parse($tuyen->giodi)->format('H:i') : '--:--' }}
                     </span>
@@ -108,29 +113,32 @@
                     </div>
                 </div>
                 
-                <button class="btn-book" onclick="bookRoute({{ $tuyen->id }})">
-                    <i class="fas fa-calendar-check"></i> ĐẶT NGAY
+                <button class="btn-book" onclick="bookRoute({{ $tuyen->matuyen }})">
+                    ĐẶT NGAY
                 </button>
             </div>
         </div>
     @empty
-        <div class="route-card" style="grid-column: 1 / -1;">
+        <div class="route-card" style="grid-column: 1 / -1; text-align: center;">
             <div class="route-header">
-                <i class="fas fa-route"></i> Chưa có tuyến xe
+                <i class="fas fa-exclamation-triangle"></i> Không tìm thấy tuyến xe
             </div>
             <div class="route-body">
-                <div class="route-points" style="justify-content:center;">
-                    <span class="from-to">Hiện chưa có dữ liệu tuyến xe trong hệ thống.</span>
-                </div>
+                <p>Không có tuyến xe phù hợp với <strong>
+                    @if(request('from')) {{ request('from') }} → @endif
+                    @if(request('to')) {{ request('to') }} @endif
+                    @if(request('time')) lúc {{ request('time') }} @endif
+                </strong></p>
+                <p>Vui lòng chọn lại điểm đi, điểm đến hoặc giờ đi khác.</p>
             </div>
         </div>
     @endforelse
 </div>
 
 <script>
-function bookRoute(routeId) {
-    window.location.href = "{{ url('/booking') }}/" + routeId;
-}
+    function bookRoute(routeId) {
+        window.location.href = "{{ url('/byticket') }}/" + routeId;
+    }
 </script>
         <!-- KHU VỰC KHUYẾN MÃI & PHẢN HỒI -->
         <div class="promo-block">

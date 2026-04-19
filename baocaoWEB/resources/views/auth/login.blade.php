@@ -67,7 +67,11 @@
                                 <i class="fas fa-eye toggle-password" id="togglePassword"></i>
                             </div>
                             <div class="forgot-password">
-                                <a href="{{ route('password.request') }}">Quên mật khẩu?</a>
+                                @if (\Illuminate\Support\Facades\Route::has('password.request'))
+                                    <a href="{{ route('password.request') }}">Quên mật khẩu?</a>
+                                @else
+                                    <span>Quên mật khẩu? Vui lòng liên hệ admin.</span>
+                                @endif
                             </div>
                         </div>
 

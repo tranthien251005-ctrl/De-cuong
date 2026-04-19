@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\TaiKhoan;
-use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
     public function showLoginForm()
     {
-        // Vì file nằm trong thư mục auth
+        if (session('isLoggedIn')) {
+            return redirect()->route('home');
+        }
+
         return view('auth.login');
     }
 
@@ -23,53 +25,38 @@ class LoginController extends Controller
         ]);
 
         $phone = trim($request->phone);
-        $password = $request->password;
-
-        // Admin hardcoded (tạm thời cho phát triển)
-        if ($phone === 'admin' && $password === '12345678') {
-            session([
-                'isAdmin' => true,
-                'userRole' => 'admin',
-                'userPhone' => 'admin',
-                'userName' => 'Quản trị viên',
-                'isLoggedIn' => true,
-            ]);
-            return redirect()->intended('/admin');
-        }
+        $password = (string) $request->password;
 
         try {
-            // Tìm user theo số điện thoại
-            $user = User::where('phone', $phone)->first();
-
-            if (!$user) {
+            $account = TaiKhoan::where('phone', $phone)->first();
+            if (!$account) {
                 return back()->withErrors(['Số điện thoại chưa được đăng ký!'])->withInput();
             }
 
-            // Kiểm tra mật khẩu
-            if ($user->password !== $password) {
+            $storedPassword = (string) ($account->password ?? '');
+            if (!hash_equals($storedPassword, $password)) {
                 return back()->withErrors(['Mật khẩu không chính xác!'])->withInput();
             }
 
-            $role = $user->role ?? 'khach_hang';
+            $role = $account->role ?: 'khach_hang';
+            $fullName = (string) ($account->hoten ?? '');
+            $displayName = $fullName !== '' ? $fullName : ($account->email ?: $account->phone);
 
-            // Lưu session
             session([
                 'isAdmin' => $role === 'admin',
                 'userRole' => $role,
-                'userPhone' => $user->phone,
-                'userName' => $user->full_name ?? $user->phone,
-                'userFullName' => $user->full_name,
-                'userId' => $user->id,
+                'userPhone' => $account->phone,
+                'userName' => $displayName,
+                'userFullName' => $fullName,
+                'userId' => $account->id,
                 'isLoggedIn' => true,
             ]);
 
-            // Chuyển hướng theo role
             if ($role === 'admin') {
-                return redirect()->intended('/admin');
+                return redirect()->intended(route('admin.dashboard'));
             }
 
-            // Tài xế và khách hàng đều về trang chủ
-            return redirect()->intended('/');
+            return redirect()->intended(route('home'));
         } catch (\Exception $e) {
             Log::error('Login exception: ' . $e->getMessage());
             return back()->withErrors(['Lỗi hệ thống, vui lòng thử lại sau!'])->withInput();
@@ -79,6 +66,6 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         session()->flush();
-        return redirect('/login');
+        return redirect()->route('login');
     }
 }

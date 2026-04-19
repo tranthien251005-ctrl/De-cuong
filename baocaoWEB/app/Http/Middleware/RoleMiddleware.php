@@ -9,19 +9,21 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        // Kiểm tra đã đăng nhập chưa
         if (!session()->has('isLoggedIn')) {
-            return redirect('/login')->withErrors(['Vui lòng đăng nhập!']);
+            return redirect()->route('login')->withErrors(['Vui lòng đăng nhập!']);
         }
 
-        // Kiểm tra role có được phép không
-        $userRole = session('userRole', 'user');
-
-        if (in_array($userRole, $roles)) {
+        // Nếu không truyền role thì chỉ cần đăng nhập là được phép
+        if (count($roles) === 0) {
             return $next($request);
         }
 
-        // Không có quyền truy cập
+        $userRole = session('userRole', 'khach_hang');
+        if (in_array($userRole, $roles, true)) {
+            return $next($request);
+        }
+
         abort(403, 'Bạn không có quyền truy cập trang này!');
     }
 }
+

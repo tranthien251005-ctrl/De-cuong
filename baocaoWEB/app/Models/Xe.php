@@ -4,20 +4,30 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Ghe extends Model
+class Xe extends Model
 {
-    protected $table = 'vitrighe';
-    protected $primaryKey = 'maghe';
-    
+    protected $table = 'xe';
+    protected $primaryKey = 'maxe';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    public $timestamps = false;
+
     protected $fillable = [
-        'tenghe',
+        'biensoxe',
+        'loaixe',
+        'soghe',
+        'nhaxe',
         'trangthai',
-        'maxe',
     ];
-    
-    // Quan hệ: một ghế thuộc về một xe
-    public function xe()
+
+    public function ghes()
     {
-        return $this->belongsTo(Xe::class, 'maxe', 'maxe');
+        return $this->hasMany(Ghe::class, 'maxe', 'maxe');
+    }
+
+    public function tuyenXes()
+    {
+        return $this->hasMany(TuyenXe::class, 'maxe', 'maxe');
     }
 }
+

@@ -1,15 +1,7 @@
 <style>
-    * {
-        margin: 0;
-        padding: 0;
+    .main-header,
+    .main-header * {
         box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f4f4f4;
-        color: #333;
-        padding-top: 70px;
     }
 
     .main-header {
@@ -31,14 +23,14 @@
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
-        gap: 10px;
-        padding: 10px 0;
+        gap: 8px;
+        padding: 6px 0;
     }
 
     .left-section {
         display: flex;
         align-items: center;
-        gap: 30px;
+        gap: 24px;
     }
 
     .logo {
@@ -46,26 +38,31 @@
     }
 
     .logo h1 {
-        font-size: 20px;
-        margin-bottom: 2px;
+        font-size: 18px;
+        line-height: 1.15;
+        margin: 0 0 1px;
     }
 
     .logo p {
-        font-size: 12px;
+        font-size: 11px;
+        line-height: 1.2;
         opacity: 0.8;
+        margin: 0;
     }
 
     .navbar ul {
         display: flex;
         list-style: none;
-        gap: 20px;
+        gap: 18px;
+        margin: 0;
+        padding: 0;
     }
 
     .navbar ul li a {
         color: #333;
         text-decoration: none;
         font-weight: 500;
-        font-size: 15px;
+        font-size: 14px;
         transition: 0.2s;
     }
 
@@ -73,12 +70,7 @@
         color: #0f766e;
     }
 
-    .user-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
+    .user-actions,
     .user-menu {
         display: flex;
         align-items: center;
@@ -88,7 +80,7 @@
     .user-name {
         color: #333;
         font-weight: 500;
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .user-name i {
@@ -100,14 +92,15 @@
     .logout-btn {
         color: #333;
         text-decoration: none;
-        padding: 6px 14px;
+        padding: 5px 12px;
         border-radius: 6px;
         transition: 0.3s;
         font-weight: 500;
-        font-size: 14px;
+        font-size: 13px;
         border: none;
         cursor: pointer;
         background: transparent;
+        font-family: inherit;
     }
 
     .user-actions .register {
@@ -122,6 +115,22 @@
     .user-actions .login:hover,
     .logout-btn:hover {
         background-color: #f0f0f0;
+    }
+
+    @media (max-width: 768px) {
+        .container-header {
+            width: 94%;
+            align-items: flex-start;
+        }
+
+        .left-section {
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .navbar ul {
+            gap: 12px;
+        }
     }
 </style>
 
@@ -160,4 +169,3 @@
         </div>
     </div>
 </header>
-

@@ -24,6 +24,7 @@ Route::middleware('role')->group(function () {
     Route::get('/byticket/{matuyen?}', [BookingController::class, 'byticket'])->name('byticket');
 
     Route::get('/payment/{matuyen?}', [PaymentController::class, 'show'])->name('payment');
+    Route::post('/payment/{matuyen}/confirm', [PaymentController::class, 'confirm'])->name('payment.confirm');
 
     Route::get('/bill', function () {
         return view('layouts.bill');
@@ -47,4 +48,3 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
     Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
 });
-

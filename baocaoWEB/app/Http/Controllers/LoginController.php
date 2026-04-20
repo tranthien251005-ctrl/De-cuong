@@ -11,6 +11,10 @@ class LoginController extends Controller
     public function showLoginForm()
     {
         if (session('isLoggedIn')) {
+            if (session('userRole') === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+
             return redirect()->route('home');
         }
 
@@ -38,7 +42,10 @@ class LoginController extends Controller
                 return back()->withErrors(['Mật khẩu không chính xác!'])->withInput();
             }
 
-            $role = $account->role ?: 'khach_hang';
+            $role = strtolower(trim((string) ($account->role ?? '')));
+            if ($role === '') {
+                $role = 'khach_hang';
+            }
             $fullName = (string) ($account->hoten ?? '');
             $displayName = $fullName !== '' ? $fullName : ($account->email ?: $account->phone);
 
@@ -53,7 +60,14 @@ class LoginController extends Controller
             ]);
 
             if ($role === 'admin') {
-                return redirect()->intended(route('admin.dashboard'));
+                $intended = (string) session('url.intended', '');
+                $intendedPath = (string) (parse_url($intended, PHP_URL_PATH) ?? '');
+                if ($intendedPath !== '' && str_starts_with($intendedPath, '/admin')) {
+                    return redirect()->intended(route('admin.dashboard'));
+                }
+
+                session()->forget('url.intended');
+                return redirect()->route('admin.dashboard');
             }
 
             return redirect()->intended(route('home'));

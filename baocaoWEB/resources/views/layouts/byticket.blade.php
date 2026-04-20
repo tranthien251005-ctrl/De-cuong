@@ -5,7 +5,7 @@
     <title>MY BUS - Đặt vé</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/byticket.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/byticket.css') }}?v=2">
 </head>
 <body>
     @include('pages.header')
@@ -81,6 +81,7 @@
 
     <script>
         let selectedSeats = [];
+        let selectedSeatIds = [];
         let pricePerTicket = {{ (int) ($tuyen->giatien ?? 0) }};
 
         function initSeatEvents() {
@@ -88,13 +89,16 @@
                 seat.style.cursor = 'pointer';
                 seat.addEventListener('click', function() {
                     const seatName = this.innerText.trim();
+                    const seatId = this.dataset.seatId;
 
                     if (this.classList.contains('selected')) {
                         this.classList.remove('selected');
                         selectedSeats = selectedSeats.filter(s => s !== seatName);
+                        selectedSeatIds = selectedSeatIds.filter(id => id !== seatId);
                     } else {
                         this.classList.add('selected');
                         selectedSeats.push(seatName);
+                        selectedSeatIds.push(seatId);
                     }
                     updateSummary();
                 });
@@ -139,9 +143,10 @@
 
             const travelDate = dateInput?.value || '';
             const seats = encodeURIComponent(selectedSeats.join(','));
+            const seatIds = encodeURIComponent(selectedSeatIds.join(','));
             const date = encodeURIComponent(travelDate);
 
-            window.location.href = "{{ url('/payment') }}/{{ $tuyen->matuyen ?? '' }}?seats=" + seats + "&date=" + date;
+            window.location.href = "{{ url('/payment') }}/{{ $tuyen->matuyen ?? '' }}?seats=" + seats + "&seat_ids=" + seatIds + "&date=" + date;
         });
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -150,4 +155,3 @@
     </script>
 </body>
 </html>
-

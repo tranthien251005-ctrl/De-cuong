@@ -8,6 +8,7 @@
             font-family: 'Inter', sans-serif;
             background: linear-gradient(145deg, #f4f8fe 0%, #e9f0f8 100%);
             min-height: 100vh;
+            padding-top: 82px;
         }
         
         .page-wrapper {
@@ -24,6 +25,70 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.12);
             overflow: hidden;
             transition: all 0.2s;
+        }
+
+        .route-info-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            padding: 24px 32px;
+            background: linear-gradient(110deg, #0f766e, #0f2b3d);
+            color: #ffffff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .route-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .route-title i {
+            color: #fbbf24;
+        }
+
+        .route-details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 12px 18px;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .route-details strong {
+            color: #ffffff;
+        }
+
+        .date-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 32px;
+            background: #ffffff;
+            border-bottom: 1px solid #edf2f9;
+            color: #163447;
+            font-weight: 700;
+        }
+
+        .date-input {
+            border: 1px solid #d5e0ec;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            color: #163447;
+            background: #f9fcff;
+            outline: none;
+        }
+
+        .date-input:focus {
+            border-color: #0f766e;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.16);
         }
 
         /* Thanh tìm kiếm - đã cập nhật select theo yêu cầu */
@@ -282,4 +347,43 @@
         .btn-book-final:hover {
             background: #dc2f02;
             transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 112px;
+            }
+
+            .page-wrapper {
+                margin: 1rem auto;
+                padding: 0 1rem;
+            }
+
+            .route-info-banner,
+            .date-selector {
+                padding: 18px;
+            }
+
+            .route-info-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .route-details {
+                justify-content: flex-start;
+            }
+
+            .date-selector {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .date-input {
+                width: 100%;
+            }
+
+            .result-section {
+                grid-template-columns: 1fr;
+                padding: 18px;
+            }
         }

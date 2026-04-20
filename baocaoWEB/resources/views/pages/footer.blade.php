@@ -54,10 +54,8 @@
 </footer>
 
 <style>
-    /* Reset margins */
-    * {
-        margin: 0;
-        padding: 0;
+    .main-footer,
+    .main-footer * {
         box-sizing: border-box;
     }
 

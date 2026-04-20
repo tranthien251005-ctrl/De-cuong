@@ -19,6 +19,7 @@
             margin: 0;
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             color: var(--text);
+            padding-top: 58px;
             background:
                 radial-gradient(circle at top left, rgba(255, 213, 156, 0.45), transparent 30%),
                 radial-gradient(circle at bottom right, rgba(255, 178, 129, 0.35), transparent 24%),
@@ -27,12 +28,30 @@
 
         .payment-page {
             min-height: 100vh;
-            padding: 32px 20px 64px;
+            padding: 24px 20px 64px;
         }
 
         .payment-shell {
             max-width: 1120px;
             margin: 0 auto;
+        }
+
+        .payment-error {
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            background: #fef2f2;
+            color: #b91c1c;
+            font-weight: 700;
+        }
+
+        .payment-error p {
+            margin: 0 0 6px;
+        }
+
+        .payment-error p:last-child {
+            margin-bottom: 0;
         }
 
         .payment-hero {

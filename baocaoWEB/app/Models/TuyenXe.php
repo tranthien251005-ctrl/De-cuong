@@ -19,17 +19,18 @@ class TuyenXe extends Model
         'diemden',
         'thoigiandukien',
         'khoangcach',
-        'giodi',
-        'gioden',
         'giatien',
+        'trangthai',
         'maxe',
     ];
 
+    // Quan hệ với bảng xe
     public function xe()
     {
         return $this->belongsTo(Xe::class, 'maxe', 'maxe');
     }
 
+    // Lấy biển số xe
     public function getBienSoXeAttribute()
     {
         if (!$this->maxe) {
@@ -40,6 +41,7 @@ class TuyenXe extends Model
         return $xe ? $xe->biensoxe : 'Không tìm thấy';
     }
 
+    // Lấy số ghế
     public function getGhesAttribute()
     {
         if (!$this->maxe) {
@@ -48,5 +50,9 @@ class TuyenXe extends Model
 
         return Ghe::where('maxe', $this->maxe)->get();
     }
-}
 
+    public function chuyenXes()
+    {
+        return $this->hasMany(ChuyenXe::class, 'matuyen', 'matuyen');
+    }
+}

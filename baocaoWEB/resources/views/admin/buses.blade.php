@@ -19,170 +19,166 @@
                         <h1>Quản lý xe</h1>
                         <p>Danh sách tất cả xe trong hệ thống</p>
                     </div>
-                    <button onclick="openCreateModal()" class="btn-primary">
+                    <button onclick="openCreateBusModal()" class="btn-primary">
                         <i class="fas fa-plus"></i> Thêm xe mới
                     </button>
                 </div>
                 
+                @if(session('success'))
+                    <div class="alert-success">
+                        <i class="fas fa-check-circle"></i> {{ session('success') }}
+                    </div>
+                @endif
+                
+                @if(session('error'))
+                    <div class="alert-error">
+                        <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+                    </div>
+                @endif
+                
                 <!-- Filter -->
                 <div class="filter-section">
                     <div class="filter-group">
-                        <select class="filter-select">
-                            <option>Tất cả trạng thái</option>
-                            <option>Đang hoạt động</option>
-                            <option>Bảo trì</option>
-                            <option>Ngừng hoạt động</option>
+                        <select id="statusFilter" class="filter-select">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="Đang hoạt động">Đang hoạt động</option>
+                            <option value="Bảo trì">Bảo trì</option>
+                            <option value="Ngừng hoạt động">Ngừng hoạt động</option>
                         </select>
-                        <input type="text" placeholder="Tìm kiếm xe..." class="filter-search">
-                        <button class="filter-btn">
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm biển số hoặc loại xe..." class="filter-search">
+                        <button class="filter-btn" onclick="filterBuses()">
                             <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                        <button class="filter-btn" onclick="resetBusFilter()">
+                            <i class="fas fa-redo"></i> Làm mới
                         </button>
                     </div>
                 </div>
                 
                 <!-- Bảng danh sách xe -->
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Biển số xe</th>
-                            <th>Loại xe</th>
-                            <th>Số ghế</th>
-                            <th>Nhà xe</th>
-                            <th>Trạng thái</th>
-                            <th class="text-center">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td>1</td>
-                            <td class="font-medium">29A-12345</td>
-                            <td>Giường nằm</td>
-                            <td>40</td>
-                            <td>MY BUS</td>
-                            <td><span class="badge-success">Đang hoạt động</span></td>
-                            <td class="text-center">
-                                <div class="action-group">
-                                    <button onclick="editBus(1)" class="action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="deleteBus(1)" class="action-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td>2</td>
-                            <td class="font-medium">29B-67890</td>
-                            <td>Limousine</td>
-                            <td>22</td>
-                            <td>MY BUS</td>
-                            <td><span class="badge-warning">Bảo trì</span></td>
-                            <td class="text-center">
-                                <div class="action-group">
-                                    <button onclick="editBus(2)" class="action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="deleteBus(2)" class="action-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td>3</td>
-                            <td class="font-medium">29C-11223</td>
-                            <td>Ghế ngồi</td>
-                            <td>35</td>
-                            <td>MY BUS</td>
-                            <td><span class="badge-success">Đang hoạt động</span></td>
-                            <td class="text-center">
-                                <div class="action-group">
-                                    <button onclick="editBus(3)" class="action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="deleteBus(3)" class="action-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Biển số xe</th>
+                                <th>Loại xe</th>
+                                <th>Số ghế</th>
+                                <th>Nhà xe</th>
+                                <th>Trạng thái</th>
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="busTableBody">
+                            @forelse($buses as $bus)
+                            <tr class="bus-row" data-status="{{ $bus->trangthai }}" data-search="{{ strtolower($bus->biensoxe . ' ' . $bus->loaixe) }}">
+                                <td>{{ $bus->maxe }}</td>
+                                <td class="font-medium">{{ $bus->biensoxe }}</td>
+                                <td>{{ $bus->loaixe }}</td>
+                                <td>{{ $bus->soghe }}</td>
+                                <td>{{ $bus->nhaxe }}</td>
+                                <td>
+                                    @if($bus->trangthai === 'Đang hoạt động')
+                                        <span class="badge-success"><i class="fas fa-check-circle"></i> {{ $bus->trangthai }}</span>
+                                    @elseif($bus->trangthai === 'Bảo trì')
+                                        <span class="badge-warning"><i class="fas fa-tools"></i> {{ $bus->trangthai }}</span>
+                                    @else
+                                        <span class="badge-danger"><i class="fas fa-stop-circle"></i> {{ $bus->trangthai }}</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <div class="action-group">
+                                        <button onclick="editBus({{ $bus->maxe }})" class="action-edit" title="Sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteBus({{ $bus->maxe }})" class="action-delete" title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="7" class="text-center p-4 text-gray-500">
+                                    <i class="fas fa-database"></i> Chưa có dữ liệu xe
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
                 
-                <!-- Pagination -->
+                <!-- Phân trang -->
                 <div class="pagination">
-                    <p class="pagination-info">Hiển thị 1-3 của 10 xe</p>
-                    <div class="pagination-buttons">
-                        <button class="pagination-btn">Trước</button>
-                        <button class="pagination-btn active">1</button>
-                        <button class="pagination-btn">2</button>
-                        <button class="pagination-btn">3</button>
-                        <button class="pagination-btn">Sau</button>
-                    </div>
+                    <p class="pagination-info">Hiển thị <span id="showingCount">{{ count($buses) }}</span> / <span id="totalCount">{{ count($buses) }}</span> xe</p>
                 </div>
             </div>
         </main>
     </div>
     
-    <!-- Modal thêm/sửa xe -->
-    <div id="busModal" class="modal">
-        <div class="modal-content">
-            <h2 class="modal-header" id="modalTitle">Thêm xe mới</h2>
-            <form id="busForm">
-                <div class="form-group">
-                    <label class="form-label">Biển số xe</label>
-                    <input type="text" class="form-input" placeholder="VD: 29A-12345">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Loại xe</label>
-                    <select class="form-select">
-                        <option>Giường nằm</option>
-                        <option>Limousine</option>
-                        <option>Ghế ngồi</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Số ghế</label>
-                    <input type="number" class="form-input" placeholder="Số lượng ghế">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Trạng thái</label>
-                    <select class="form-select">
-                        <option>Đang hoạt động</option>
-                        <option>Bảo trì</option>
-                        <option>Ngừng hoạt động</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" onclick="closeModal()" class="btn-outline flex-1">Hủy</button>
-                    <button type="submit" class="btn-primary flex-1">Lưu</button>
-                </div>
-            </form>
+<!-- Modal thêm/sửa xe -->
+<div id="busModal" class="modal">
+    <div class="modal-content">
+        <h2 class="modal-header" id="modalTitle">Thêm xe mới</h2>
+        <form id="busForm" method="POST" action="{{ route('admin.buses.store') }}">
+            @csrf
+            <input type="hidden" id="busId" name="busId">
+            <div class="form-group">
+                <label class="form-label">Biển số xe <span class="required">*</span></label>
+                <input type="text" id="biensoxe" name="biensoxe" class="form-input" placeholder="VD: 29A-12345" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Loại xe <span class="required">*</span></label>
+                <select id="loaixe" name="loaixe" class="form-select" required>
+                    <option value="">Chọn loại xe</option>
+                    <option value="Giường nằm">Giường nằm</option>
+                    <option value="Limousine">Limousine</option>
+                    <option value="Ghế ngồi">Ghế ngồi</option>
+                    <option value="Xe khách">Xe khách</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Số ghế <span class="required">*</span></label>
+                <input type="number" id="soghe" name="soghe" class="form-input" placeholder="Số lượng ghế" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nhà xe <span class="required">*</span></label>
+                <input type="text" id="nhaxe" name="nhaxe" class="form-input" placeholder="Tên nhà xe" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Trạng thái <span class="required">*</span></label>
+                <select id="trangthai" name="trangthai" class="form-select" required>
+                    <option value="Đang hoạt động">Đang hoạt động</option>
+                    <option value="Bảo trì">Bảo trì</option>
+                    <option value="Ngừng hoạt động">Ngừng hoạt động</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeBusModal()" class="btn-outline flex-1">Hủy</button>
+                <button type="submit" class="btn-primary flex-1">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa xe -->
+<div id="deleteBusModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header" style="color: #dc2626;">
+            <i class="fas fa-exclamation-triangle"></i> Xác nhận xóa xe
+        </div>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn xóa xe này?</p>
+            <p class="text-sm text-gray-500 mt-2">Hành động này không thể hoàn tác!</p>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeDeleteBusModal()" class="btn-outline">Hủy</button>
+            <button id="confirmDeleteBusBtn" class="btn-primary" style="background-color: #dc2626;">Xóa</button>
         </div>
     </div>
+</div>
     
-    <script>
-        function openCreateModal() {
-            document.getElementById('modalTitle').innerText = 'Thêm xe mới';
-            document.getElementById('busModal').classList.add('show');
-        }
-        
-        function closeModal() {
-            document.getElementById('busModal').classList.remove('show');
-        }
-        
-        function editBus(id) {
-            document.getElementById('modalTitle').innerText = 'Sửa thông tin xe';
-            document.getElementById('busModal').classList.add('show');
-        }
-        
-        function deleteBus(id) {
-            if(confirm('Bạn có chắc chắn muốn xóa xe này?')) {
-                alert('Đã xóa xe!');
-            }
-        }
-    </script>
+    <script src="{{ asset('js/admin.js') }}"></script>
+
 </body>
 </html>

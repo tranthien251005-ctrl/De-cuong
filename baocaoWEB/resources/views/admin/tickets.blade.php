@@ -8,10 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 </head>
-<body>
+<body data-page="admin-tickets" data-ticket-form-has-errors='@json($errors->any())'>
     <div class="admin-container">
         @include('admin.partials.sidebar')
-        
+
         <main class="admin-main">
             <div class="main-content">
                 <div class="header-actions">
@@ -20,22 +20,33 @@
                         <p>Danh sách tất cả vé đã bán</p>
                     </div>
                     <div class="action-group" style="gap: 0.75rem;">
-                        <button onclick="exportTickets()" class="btn-primary">
+                        <a href="{{ route('admin.tickets.export') }}" class="btn-primary">
                             <i class="fas fa-file-excel"></i> Xuất Excel
-                        </button>
-                        <button onclick="printReport()" class="btn-outline">
+                        </a>
+                        <button onclick="window.print()" class="btn-outline">
                             <i class="fas fa-print"></i> In báo cáo
                         </button>
                     </div>
                 </div>
-                
-                <!-- Thống kê nhanh -->
+
+                @if(session('success'))
+                    <div class="alert-success">
+                        <i class="fas fa-check-circle"></i> {{ session('success') }}
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="alert-error">
+                        <i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}
+                    </div>
+                @endif
+
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-card-content">
                             <div>
                                 <p class="stat-label">Tổng vé đã bán</p>
-                                <p class="stat-value">1,234</p>
+                                <p class="stat-value">{{ number_format($totalTickets ?? count($tickets)) }}</p>
                             </div>
                             <div class="stat-icon bg-blue-100">
                                 <i class="fas fa-ticket-alt text-blue-600"></i>
@@ -46,7 +57,7 @@
                         <div class="stat-card-content">
                             <div>
                                 <p class="stat-label">Doanh thu</p>
-                                <p class="stat-value">185.5M</p>
+                                <p class="stat-value">{{ number_format($totalRevenue ?? 0) }}đ</p>
                             </div>
                             <div class="stat-icon bg-green-100">
                                 <i class="fas fa-money-bill-wave text-green-600"></i>
@@ -56,217 +67,175 @@
                     <div class="stat-card">
                         <div class="stat-card-content">
                             <div>
-                                <p class="stat-label">Vé hôm nay</p>
-                                <p class="stat-value">45</p>
+                                <p class="stat-label">Đã thanh toán</p>
+                                <p class="stat-value">{{ $daThanhToan ?? 0 }}</p>
                             </div>
-                            <div class="stat-icon bg-orange-100">
-                                <i class="fas fa-calendar-day text-orange-600"></i>
+                            <div class="stat-icon bg-success-100">
+                                <i class="fas fa-check-circle text-success-600"></i>
                             </div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-card-content">
                             <div>
-                                <p class="stat-label">Tỷ lệ lấp đầy</p>
-                                <p class="stat-value">78%</p>
+                                <p class="stat-label">Chờ thanh toán</p>
+                                <p class="stat-value">{{ $choThanhToan ?? 0 }}</p>
                             </div>
-                            <div class="stat-icon bg-purple-100">
-                                <i class="fas fa-chart-line text-purple-600"></i>
+                            <div class="stat-icon bg-warning-100">
+                                <i class="fas fa-clock text-warning-600"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Filter -->
+
                 <div class="filter-section">
                     <div class="filter-group">
-                        <input type="date" class="filter-input">
-                        <input type="date" class="filter-input">
-                        <select class="filter-select">
-                            <option>Tất cả trạng thái</option>
-                            <option>Đã thanh toán</option>
-                            <option>Chờ thanh toán</option>
-                            <option>Đã hủy</option>
+                        <input type="date" id="filterDateFrom" class="filter-input" placeholder="Từ ngày">
+                        <input type="date" id="filterDateTo" class="filter-input" placeholder="Đến ngày">
+                        <select id="filterStatus" class="filter-select">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="da_thanh_toan">Đã thanh toán</option>
+                            <option value="cho_thanh_toan">Chờ thanh toán</option>
+                            <option value="da_huy">Đã hủy</option>
                         </select>
-                        <input type="text" placeholder="Mã vé / SĐT khách..." class="filter-search">
-                        <button class="filter-btn">
+                        <input type="text" id="searchInput" placeholder="Mã vé / SĐT khách..." class="filter-search">
+                        <button class="filter-btn" onclick="filterTickets()">
                             <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                        <button class="filter-btn" onclick="resetTicketFilter()">
+                            <i class="fas fa-redo"></i> Làm mới
                         </button>
                     </div>
                 </div>
-                
-                <!-- Bảng danh sách vé -->
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Mã vé</th>
-                            <th>Hành khách</th>
-                            <th>Tuyến đường</th>
-                            <th>Ngày đi</th>
-                            <th>Giờ đi</th>
-                            <th>Ghế</th>
-                            <th>Giá vé</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="font-medium" style="color: #2563eb;">#V-001234</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>Hà Nội - Nam Định</td>
-                            <td>15/04/2026</td>
-                            <td>08:00</td>
-                            <td>A12</td>
-                            <td class="font-semibold">150,000đ</td>
-                            <td><span class="badge-success">Đã thanh toán</span></td>
-                            <td>
-                                <div class="action-group">
-                                    <button onclick="viewTicket('#V-001234')" class="action-view">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button onclick="cancelTicket('#V-001234')" class="action-delete">
-                                        <i class="fas fa-times-circle"></i>
-                                    </button>
-                                    <button onclick="printTicket('#V-001234')" class="action-edit">
-                                        <i class="fas fa-print"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="font-medium" style="color: #2563eb;">#V-001235</td>
-                            <td>Trần Thị B</td>
-                            <td>Hà Nội - Ninh Bình</td>
-                            <td>15/04/2026</td>
-                            <td>09:30</td>
-                            <td>B05</td>
-                            <td class="font-semibold">120,000đ</td>
-                            <td><span class="badge-warning">Chờ thanh toán</span></td>
-                            <td>
-                                <div class="action-group">
-                                    <button onclick="viewTicket('#V-001235')" class="action-view">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button onclick="cancelTicket('#V-001235')" class="action-delete">
-                                        <i class="fas fa-times-circle"></i>
-                                    </button>
-                                    <button onclick="printTicket('#V-001235')" class="action-edit">
-                                        <i class="fas fa-print"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="font-medium" style="color: #2563eb;">#V-001236</td>
-                            <td>Lê Văn C</td>
-                            <td>Nam Định - Thanh Hóa</td>
-                            <td>16/04/2026</td>
-                            <td>14:00</td>
-                            <td>C08</td>
-                            <td class="font-semibold">90,000đ</td>
-                            <td><span class="badge-danger">Đã hủy</span></td>
-                            <td>
-                                <div class="action-group">
-                                    <button onclick="viewTicket('#V-001236')" class="action-view">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button onclick="cancelTicket('#V-001236')" class="action-delete">
-                                        <i class="fas fa-times-circle"></i>
-                                    </button>
-                                    <button onclick="printTicket('#V-001236')" class="action-edit">
-                                        <i class="fas fa-print"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <!-- Pagination -->
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Mã vé</th>
+                                <th>Khách hàng</th>
+                                <th>Số điện thoại</th>
+                                <th>Số ghế</th>
+                                <th>Ngày đặt</th>
+                                <th>Hình thức</th>
+                                <th>Giá vé</th>
+                                <th>Trạng thái</th>
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($tickets as $ticket)
+                                <tr class="ticket-row" data-status="{{ $ticket->trangthai }}" data-search="{{ strtolower($ticket->mave . ' ' . ($ticket->taiKhoan->phone ?? '')) }}">
+                                    <td class="font-medium" style="color: #2563eb;">#V{{ str_pad($ticket->mave, 6, '0', STR_PAD_LEFT) }}</td>
+                                    <td>{{ $ticket->ten_khach }}</td>
+                                    <td>{{ $ticket->so_dien_thoai }}</td>
+                                    <td>{{ $ticket->ghe->tenghe ?? 'N/A' }}</td>
+                                    <td>{{ $ticket->ngay_dat_formatted }}</td>
+                                    <td>
+                                        @if($ticket->hinhthucthanhtoan == 'chuyen_khoan')
+                                            <span class="badge-info">Chuyển khoản</span>
+                                        @else
+                                            <span class="badge-info">Tiền mặt</span>
+                                        @endif
+                                    </td>
+                                    <td class="font-semibold">{{ $ticket->tong_so_tien_formatted }}</td>
+                                    <td>
+                                        @if($ticket->trangthai == 'da_thanh_toan')
+                                            <span class="badge-success"><i class="fas fa-check-circle"></i> Đã thanh toán</span>
+                                        @elseif($ticket->trangthai == 'cho_thanh_toan')
+                                            <span class="badge-warning"><i class="fas fa-clock"></i> Chờ thanh toán</span>
+                                        @else
+                                            <span class="badge-danger"><i class="fas fa-times-circle"></i> Đã hủy</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="action-group">
+                                            <button onclick="viewTicket({{ $ticket->mave }})" class="action-view" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button onclick="updateTicketStatus({{ $ticket->mave }})" class="action-edit" title="Cập nhật trạng thái">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="deleteTicket({{ $ticket->mave }})" class="action-delete" title="Xóa vé">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <button onclick="printTicket({{ $ticket->mave }})" class="action-print" title="In vé">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" class="text-center p-4 text-gray-500">
+                                        <i class="fas fa-database"></i> Chưa có dữ liệu vé
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
                 <div class="pagination">
-                    <p class="pagination-info">Hiển thị 1-3 của 234 vé</p>
-                    <div class="pagination-buttons">
-                        <button class="pagination-btn">Trước</button>
-                        <button class="pagination-btn active">1</button>
-                        <button class="pagination-btn">2</button>
-                        <button class="pagination-btn">3</button>
-                        <button class="pagination-btn">Sau</button>
-                    </div>
+                    <p class="pagination-info">Hiển thị <span id="showingCount">{{ count($tickets) }}</span> / <span id="totalCount">{{ count($tickets) }}</span> vé</p>
                 </div>
             </div>
         </main>
     </div>
-    
-    <!-- Modal chi tiết vé -->
+
     <div id="ticketModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 500px;">
             <h2 class="modal-header">Chi tiết vé</h2>
-            <div class="form-group">
-                <label class="form-label">Mã vé:</label>
-                <p class="form-label" id="ticketCode" style="font-weight: normal;">#V-001234</p>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Hành khách:</label>
-                <p class="form-label" id="passengerName" style="font-weight: normal;">Nguyễn Văn A</p>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Số điện thoại:</label>
-                <p class="form-label" id="phone" style="font-weight: normal;">0987654321</p>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Tuyến đường:</label>
-                <p class="form-label" id="route" style="font-weight: normal;">Hà Nội - Nam Định</p>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Ngày giờ đi:</label>
-                <p class="form-label" id="departure" style="font-weight: normal;">15/04/2026 - 08:00</p>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Số ghế:</label>
-                <p class="form-label" id="seat" style="font-weight: normal;">A12</p>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Giá vé:</label>
-                <p class="form-label" id="price" style="font-weight: bold; color: #16a34a;">150,000đ</p>
+            <div class="ticket-detail" id="ticketDetail">
+                <div class="text-center p-4">
+                    <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                </div>
             </div>
             <div class="modal-footer">
-                <button onclick="closeModal()" class="btn-outline">Đóng</button>
+                <button onclick="closeTicketModal()" class="btn-outline">Đóng</button>
                 <button onclick="printCurrentTicket()" class="btn-primary">In vé</button>
             </div>
         </div>
     </div>
-    
-    <script>
-        function viewTicket(code) {
-            document.getElementById('ticketModal').classList.add('show');
-        }
-        
-        function closeModal() {
-            document.getElementById('ticketModal').classList.remove('show');
-        }
-        
-        function cancelTicket(code) {
-            if(confirm('Hủy vé ' + code + '?')) {
-                alert('Đã hủy vé!');
-            }
-        }
-        
-        function printTicket(code) {
-            alert('Đang in vé ' + code);
-        }
-        
-        function printCurrentTicket() {
-            alert('Đang in vé hiện tại');
-        }
-        
-        function exportTickets() {
-            alert('Xuất danh sách vé ra Excel');
-        }
-        
-        function printReport() {
-            alert('In báo cáo vé');
-        }
-    </script>
+
+    <div id="statusModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2 class="modal-header">Cập nhật trạng thái vé</h2>
+            <form id="statusForm" method="POST">
+                @csrf
+                <input type="hidden" id="statusTicketId" name="ticketId">
+                <div class="form-group">
+                    <label class="form-label">Trạng thái <span class="required">*</span></label>
+                    <select id="trangthai" name="trangthai" class="form-select" required>
+                        <option value="cho_thanh_toan">Chờ thanh toán</option>
+                        <option value="da_thanh_toan">Đã thanh toán</option>
+                        <option value="da_huy">Đã hủy</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="closeStatusModal()" class="btn-outline flex-1">Hủy</button>
+                    <button type="submit" class="btn-primary flex-1">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="deleteTicketModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header" style="color: #dc2626;">
+                <i class="fas fa-exclamation-triangle"></i> Xác nhận xóa vé
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa vé này?</p>
+                <p class="text-sm text-gray-500 mt-2">Hành động này không thể hoàn tác!</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeDeleteTicketModal()" class="btn-outline">Hủy</button>
+                <button id="confirmDeleteTicketBtn" class="btn-primary" style="background-color: #dc2626;">Xóa</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('js/admin.js') }}"></script>
 </body>
 </html>

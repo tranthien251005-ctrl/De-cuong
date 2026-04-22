@@ -19,99 +19,102 @@
                         <h1>Quản lý chuyến</h1>
                         <p>Danh sách tất cả chuyến xe</p>
                     </div>
-                    <button onclick="openCreateModal()" class="btn-primary">
+                    <button onclick="openCreateTripModal()" class="btn-primary">
                         <i class="fas fa-plus"></i> Thêm chuyến mới
                     </button>
                 </div>
                 
-                <!-- Filter -->
+                @if(session('success'))
+                    <div class="alert-success">
+                        <i class="fas fa-check-circle"></i> {{ session('success') }}
+                    </div>
+                @endif
+                
+                @if($errors->any())
+                    <div class="alert-error">
+                        <i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}
+                    </div>
+                @endif
+                
+                <!-- Bộ lọc -->
                 <div class="filter-section">
                     <div class="filter-group">
-                        <input type="date" class="filter-input">
-                        <select class="filter-select">
-                            <option>Tất cả tuyến</option>
-                            <option>Hà Nội - Nam Định</option>
-                            <option>Hà Nội - Ninh Bình</option>
-                            <option>Nam Định - Thanh Hóa</option>
+                        <input type="date" id="filterDate" class="filter-input" placeholder="Ngày đi">
+                        <select id="filterRoute" class="filter-select">
+                            <option value="">Tất cả tuyến</option>
+                            @foreach($routes as $route)
+                                <option value="{{ $route->matuyen }}">{{ $route->tentuyen }}</option>
+                            @endforeach
                         </select>
-                        <input type="text" placeholder="Tìm kiếm chuyến..." class="filter-search">
-                        <button class="filter-btn">
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm chuyến..." class="filter-search">
+                        <button class="filter-btn" onclick="filterTrips()">
                             <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                        <button class="filter-btn" onclick="resetTripFilter()">
+                            <i class="fas fa-redo"></i> Làm mới
                         </button>
                     </div>
                 </div>
                 
                 <!-- Bảng danh sách chuyến -->
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Tuyến đường</th>
-                            <th>Ngày đi</th>
-                            <th>Giờ đi</th>
-                            <th>Xe</th>
-                            <th>Ghế trống</th>
-                            <th>Giá vé</th>
-                            <th class="text-center">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td class="font-medium">Hà Nội - Nam Định</td>
-                            <td>15/04/2026</td>
-                            <td>08:00</td>
-                            <td>29A-12345</td>
-                            <td class="text-green-600 font-semibold">25/40</td>
-                            <td class="font-semibold">150,000đ</td>
-                            <td class="text-center">
-                                <div class="action-group">
-                                    <button onclick="editTrip(1)" class="action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="deleteTrip(1)" class="action-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    <button onclick="viewTickets(1)" class="action-view">
-                                        <i class="fas fa-ticket-alt"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td class="font-medium">Hà Nội - Ninh Bình</td>
-                            <td>15/04/2026</td>
-                            <td>09:30</td>
-                            <td>29B-67890</td>
-                            <td class="text-green-600 font-semibold">18/22</td>
-                            <td class="font-semibold">120,000đ</td>
-                            <td class="text-center">
-                                <div class="action-group">
-                                    <button onclick="editTrip(2)" class="action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="deleteTrip(2)" class="action-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    <button onclick="viewTickets(2)" class="action-view">
-                                        <i class="fas fa-ticket-alt"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tuyến đường</th>
+                                <th>Ngày đi</th>
+                                <th>Giờ đi</th>
+                                <th>Xe</th>
+                                <th>Ghế trống</th>
+                                <th>Giá vé</th>
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($trips as $trip)
+                                <tr class="trip-row" data-route="{{ $trip->matuyen }}" data-ngay="{{ $trip->ngaydi }}" data-search="{{ strtolower($trip->ten_tuyen . ' ' . ($trip->xe->biensoxe ?? '')) }}">
+                                    <td>{{ $trip->machuyen }}</td>
+                                    <td class="font-medium">{{ $trip->ten_tuyen }}</td>
+                                    <td>{{ $trip->ngay_di_formatted }}</td>
+                                    <td>{{ $trip->giodi }}</td>
+                                    <td>{{ $trip->bien_so_xe }}</td>
+                                    <td>
+                                        @php
+                                            $tongGhe = $trip->xe ? $trip->xe->soghe : 0;
+                                            $gheTrong = $trip->ghe_trong;
+                                            $percent = $tongGhe > 0 ? ($gheTrong / $tongGhe) * 100 : 0;
+                                        @endphp
+                                        <span class="{{ $gheTrong > 10 ? 'text-green-600' : 'text-red-600' }} font-semibold">
+                                            {{ $gheTrong }}/{{ $tongGhe }}
+                                        </span>
+                                    </td>
+                                    <td class="font-semibold">{{ number_format($trip->giave, 0, ',', '.') }}đ</td>
+                                    <td class="text-center">
+                                        <div class="action-group">
+                                            <button onclick="editTrip({{ $trip->machuyen }})" class="action-edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="deleteTrip({{ $trip->machuyen }})" class="action-delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="text-center p-4 text-gray-500">
+                                        <i class="fas fa-database"></i> Chưa có dữ liệu chuyến xe
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
                 
-                <!-- Pagination -->
+                <!-- Phân trang -->
                 <div class="pagination">
-                    <p class="pagination-info">Hiển thị 1-2 của 15 chuyến</p>
-                    <div class="pagination-buttons">
-                        <button class="pagination-btn">Trước</button>
-                        <button class="pagination-btn active">1</button>
-                        <button class="pagination-btn">2</button>
-                        <button class="pagination-btn">Sau</button>
-                    </div>
+                    <p class="pagination-info">Hiển thị <span id="showingCount">{{ count($trips) }}</span> / <span id="totalCount">{{ count($trips) }}</span> chuyến</p>
                 </div>
             </div>
         </main>
@@ -120,56 +123,85 @@
     <!-- Modal thêm/sửa chuyến -->
     <div id="tripModal" class="modal">
         <div class="modal-content">
-            <h2 class="modal-header" id="modalTitle">Thêm chuyến mới</h2>
-            <form id="tripForm">
+            <h2 class="modal-header" id="tripModalTitle">Thêm chuyến mới</h2>
+            <form id="tripForm" method="POST" action="{{ route('admin.trips.store') }}">
+                @csrf
+                <input type="hidden" id="tripId" name="tripId">
+                
                 <div class="form-group">
-                    <label class="form-label">Tuyến đường</label>
-                    <select class="form-select">
-                        <option>Hà Nội - Nam Định</option>
-                        <option>Hà Nội - Ninh Bình</option>
-                        <option>Nam Định - Thanh Hóa</option>
+                    <label class="form-label">Chọn tuyến <span class="required">*</span></label>
+                    <select id="matuyen" name="matuyen" class="form-select" required>
+                        <option value="">-- Chọn tuyến --</option>
+                        @foreach($routes as $route)
+                            <option value="{{ $route->matuyen }}" {{ old('matuyen') == $route->matuyen ? 'selected' : '' }}>
+                                {{ $route->tentuyen }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
+                
                 <div class="form-group">
-                    <label class="form-label">Ngày đi</label>
-                    <input type="date" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Giờ đi</label>
-                    <input type="time" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Xe</label>
-                    <select class="form-select">
-                        <option>29A-12345 (40 ghế)</option>
-                        <option>29B-67890 (22 ghế)</option>
+                    <label class="form-label">Chọn xe <span class="required">*</span></label>
+                    <select id="maxe" name="maxe" class="form-select" required>
+                        <option value="">-- Chọn xe --</option>
+                        @foreach($buses as $bus)
+                            <option value="{{ $bus->maxe }}" {{ old('maxe') == $bus->maxe ? 'selected' : '' }}>
+                                {{ $bus->biensoxe }} - {{ $bus->loaixe }} ({{ $bus->soghe }} ghế)
+                            </option>
+                        @endforeach
                     </select>
                 </div>
+                
                 <div class="form-group">
-                    <label class="form-label">Giá vé</label>
-                    <input type="number" class="form-input" placeholder="Nhập giá vé">
+                    <label class="form-label">Ngày đi <span class="required">*</span></label>
+                    <input type="date" id="ngaydi" name="ngaydi" class="form-input" value="{{ old('ngaydi') }}" required>
                 </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Giờ đi <span class="required">*</span></label>
+                    <input type="time" id="giodi" name="giodi" class="form-input" value="{{ old('giodi') }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Giá vé (VNĐ) <span class="required">*</span></label>
+                    <input type="number" id="giave" name="giave" class="form-input" placeholder="VD: 150000" value="{{ old('giave') }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Số ghế trống <span class="required">*</span></label>
+                    <input type="number" id="ghe_trong" name="ghe_trong" class="form-input" placeholder="VD: 40" value="{{ old('ghe_trong') }}" required>
+                </div>
+                
                 <div class="modal-footer">
-                    <button type="button" onclick="closeModal()" class="btn-outline flex-1">Hủy</button>
+                    <button type="button" onclick="closeTripModal()" class="btn-outline flex-1">Hủy</button>
                     <button type="submit" class="btn-primary flex-1">Lưu</button>
                 </div>
             </form>
         </div>
     </div>
     
+    <!-- Modal xác nhận xóa -->
+    <div id="deleteTripModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header" style="color: #dc2626;">
+                <i class="fas fa-exclamation-triangle"></i> Xác nhận xóa chuyến
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa chuyến này?</p>
+                <p class="text-sm text-gray-500 mt-2">Hành động này không thể hoàn tác!</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeDeleteTripModal()" class="btn-outline">Hủy</button>
+                <button id="confirmDeleteTripBtn" class="btn-primary" style="background-color: #dc2626;">Xóa</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
-        function openCreateModal() {
-            document.getElementById('modalTitle').innerText = 'Thêm chuyến mới';
-            document.getElementById('tripModal').classList.add('show');
-        }
-        
-        function closeModal() {
-            document.getElementById('tripModal').classList.remove('show');
-        }
-        
-        function editTrip(id) { alert('Sửa chuyến ID: ' + id); }
-        function deleteTrip(id) { if(confirm('Xóa chuyến?')) alert('Đã xóa'); }
-        function viewTickets(id) { alert('Xem vé chuyến ID: ' + id); }
+        // Khai báo biến để kiểm tra lỗi validation
+        window.tripFormHasErrors = @json($errors->any());
     </script>
+    
+    <script src="{{ asset('js/admin.js') }}"></script>
 </body>
 </html>

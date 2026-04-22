@@ -11,7 +11,7 @@
 <body class="font-['Inter']">
     <div class="admin-container">
         @include('admin.partials.sidebar')
-        
+
         <main class="admin-main">
             <div class="main-content">
                 <div class="header-actions">
@@ -19,163 +19,182 @@
                         <h1>Quản lý tuyến</h1>
                         <p>Danh sách tất cả tuyến xe</p>
                     </div>
-                    <button onclick="openCreateModal()" class="btn-primary">
+                    <button onclick="openCreateRouteModal()" class="btn-primary">
                         <i class="fas fa-plus"></i> Thêm tuyến mới
                     </button>
                 </div>
-                
-                <!-- Filter -->
+
+                @if(session('success'))
+                    <div class="alert-success">
+                        <i class="fas fa-check-circle"></i> {{ session('success') }}
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="alert-error">
+                        <i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}
+                    </div>
+                @endif
+
                 <div class="filter-section">
                     <div class="filter-group">
-                        <input type="text" placeholder="Tìm kiếm tuyến..." class="filter-search">
-                        <button class="filter-btn">
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm điểm đi, điểm đến..." class="filter-search">
+                        <button class="filter-btn" onclick="filterRoutes()">
                             <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                        <button class="filter-btn" onclick="resetRouteFilter()">
+                            <i class="fas fa-redo"></i> Làm mới
                         </button>
                     </div>
                 </div>
-                
-                <!-- Bảng danh sách tuyến -->
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Điểm đi</th>
-                            <th>Điểm đến</th>
-                            <th>Khoảng cách</th>
-                            <th>Thời gian</th>
-                            <th>Giá vé mặc định</th>
-                            <th>Trạng thái</th>
-                            <th class="text-center">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td>1</td>
-                            <td class="font-medium">Hà Nội</td>
-                            <td class="font-medium">Nam Định</td>
-                            <td>110 km</td>
-                            <td>2.5 giờ</td>
-                            <td class="font-semibold">150,000đ</td>
-                            <td><span class="badge-success">Đang hoạt động</span></td>
-                            <td class="text-center">
-                                <div class="action-group">
-                                    <button onclick="editRoute(1)" class="action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="deleteRoute(1)" class="action-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td>2</td>
-                            <td class="font-medium">Hà Nội</td>
-                            <td class="font-medium">Ninh Bình</td>
-                            <td>90 km</td>
-                            <td>2 giờ</td>
-                            <td class="font-semibold">120,000đ</td>
-                            <td><span class="badge-success">Đang hoạt động</span></td>
-                            <td class="text-center">
-                                <div class="action-group">
-                                    <button onclick="editRoute(2)" class="action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="deleteRoute(2)" class="action-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td>3</td>
-                            <td class="font-medium">Nam Định</td>
-                            <td class="font-medium">Thanh Hóa</td>
-                            <td>85 km</td>
-                            <td>1.8 giờ</td>
-                            <td class="font-semibold">90,000đ</td>
-                            <td><span class="badge-success">Đang hoạt động</span></td>
-                            <td class="text-center">
-                                <div class="action-group">
-                                    <button onclick="editRoute(3)" class="action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="deleteRoute(3)" class="action-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <!-- Pagination -->
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Điểm đi</th>
+                                <th>Điểm đến</th>
+                                <th>Khoảng cách</th>
+                                <th>Thời gian</th>
+                                <th>Giá vé</th>
+                                <th>Biển số xe</th>
+                                <th>Trạng thái</th>
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($routes as $route)
+                                <tr class="route-row" data-search="{{ strtolower($route->diemdi . ' ' . $route->diemden) }}">
+                                    <td>{{ $route->matuyen }}</td>
+                                    <td class="font-medium">{{ $route->diemdi }}</td>
+                                    <td>{{ $route->diemden }}</td>
+                                    <td>{{ number_format($route->khoangcach) }} km</td>
+                                    <td class="font-medium">{{ $route->thoigiandukien ?? $route->thoigian ?? 'Chưa cập nhật' }}</td>
+                                    <td class="font-semibold text-green-600">{{ number_format($route->giatien) }}đ</td>
+                                    <td>
+                                        @if($route->maxe)
+                                            <span class="badge-info">{{ $route->xe->biensoxe ?? 'Chưa cập nhật' }}</span>
+                                        @else
+                                            <span class="badge-warning">Chưa phân công</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($route->trangthai === 'Đang hoạt động')
+                                            <span class="badge-success">Đang hoạt động</span>
+                                        @else
+                                            <span class="badge-danger">Ngừng hoạt động</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="action-group">
+                                            <button onclick="editRoute({{ $route->matuyen }})" class="action-edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="deleteRoute({{ $route->matuyen }})" class="action-delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" class="text-center p-4 text-gray-500">
+                                        <i class="fas fa-database"></i> Chưa có dữ liệu tuyến xe
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
                 <div class="pagination">
-                    <p class="pagination-info">Hiển thị 1-3 của 6 tuyến</p>
-                    <div class="pagination-buttons">
-                        <button class="pagination-btn">Trước</button>
-                        <button class="pagination-btn active">1</button>
-                        <button class="pagination-btn">2</button>
-                        <button class="pagination-btn">Sau</button>
-                    </div>
+                    <p class="pagination-info">Hiển thị <span id="showingCount">{{ count($routes) }}</span> / <span id="totalCount">{{ count($routes) }}</span> tuyến</p>
                 </div>
             </div>
         </main>
     </div>
-    
-    <!-- Modal thêm/sửa tuyến -->
+
     <div id="routeModal" class="modal">
         <div class="modal-content">
-            <h2 class="modal-header" id="modalTitle">Thêm tuyến mới</h2>
-            <form id="routeForm">
+            <h2 class="modal-header" id="routeModalTitle">Thêm tuyến mới</h2>
+            <form id="routeForm" method="POST" action="{{ route('admin.routes.store') }}">
+                @csrf
+                <input type="hidden" id="routeId" name="routeId">
+
                 <div class="form-group">
-                    <label class="form-label">Điểm đi</label>
-                    <input type="text" class="form-input" placeholder="VD: Hà Nội">
+                    <label class="form-label">Chọn xe</label>
+                    <select id="maxe" name="maxe" class="form-select">
+                        <option value="">-- Chọn xe --</option>
+                        @foreach($buses as $bus)
+                            <option value="{{ $bus->maxe }}" {{ (string) old('maxe') === (string) $bus->maxe ? 'selected' : '' }}>
+                                {{ $bus->biensoxe }} - {{ $bus->loaixe }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
+
                 <div class="form-group">
-                    <label class="form-label">Điểm đến</label>
-                    <input type="text" class="form-input" placeholder="VD: Nam Định">
+                    <label class="form-label">Điểm đi <span class="required">*</span></label>
+                    <input type="text" id="diemdi" name="diemdi" class="form-input" placeholder="VD: Hà Nội" value="{{ old('diemdi') }}" required>
                 </div>
+
                 <div class="form-group">
-                    <label class="form-label">Khoảng cách (km)</label>
-                    <input type="number" class="form-input" placeholder="VD: 110">
+                    <label class="form-label">Điểm đến <span class="required">*</span></label>
+                    <input type="text" id="diemden" name="diemden" class="form-input" placeholder="VD: Nam Định" value="{{ old('diemden') }}" required>
                 </div>
+
                 <div class="form-group">
-                    <label class="form-label">Thời gian (giờ)</label>
-                    <input type="text" class="form-input" placeholder="VD: 2.5">
+                    <label class="form-label">Khoảng cách (km) <span class="required">*</span></label>
+                    <input type="number" id="khoangcach" name="khoangcach" class="form-input" placeholder="VD: 110" value="{{ old('khoangcach') }}" required>
                 </div>
+
                 <div class="form-group">
-                    <label class="form-label">Giá vé mặc định</label>
-                    <input type="number" class="form-input" placeholder="VD: 150000">
+                    <label class="form-label">Thời gian <span class="required">*</span></label>
+                    <input type="text" id="thoigian" name="thoigian" class="form-input" placeholder="VD: 2.5h" value="{{ old('thoigian') }}" required>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">Giá vé (VNĐ) <span class="required">*</span></label>
+                    <input type="number" id="giatien" name="giatien" class="form-input" placeholder="VD: 150000" value="{{ old('giatien') }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Trạng thái <span class="required">*</span></label>
+                    <select id="trangthai" name="trangthai" class="form-select" required>
+                        <option value="Đang hoạt động" {{ old('trangthai', 'Đang hoạt động') === 'Đang hoạt động' ? 'selected' : '' }}>Đang hoạt động</option>
+                        <option value="Ngừng hoạt động" {{ old('trangthai') === 'Ngừng hoạt động' ? 'selected' : '' }}>Ngừng hoạt động</option>
+                    </select>
+                </div>
+
                 <div class="modal-footer">
-                    <button type="button" onclick="closeModal()" class="btn-outline flex-1">Hủy</button>
+                    <button type="button" onclick="closeRouteModal()" class="btn-outline flex-1">Hủy</button>
                     <button type="submit" class="btn-primary flex-1">Lưu</button>
                 </div>
             </form>
         </div>
     </div>
-    
+
+    <div id="deleteRouteModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header" style="color: #dc2626;">
+                <i class="fas fa-exclamation-triangle"></i> Xác nhận xóa tuyến
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa tuyến này?</p>
+                <p class="text-sm text-gray-500 mt-2">Hành động này không thể hoàn tác!</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeDeleteRouteModal()" class="btn-outline">Hủy</button>
+                <button id="confirmDeleteRouteBtn" class="btn-primary" style="background-color: #dc2626;">Xóa</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        function openCreateModal() {
-            document.getElementById('modalTitle').innerText = 'Thêm tuyến mới';
-            document.getElementById('routeModal').classList.add('show');
-        }
-        
-        function closeModal() {
-            document.getElementById('routeModal').classList.remove('show');
-        }
-        
-        function editRoute(id) {
-            document.getElementById('modalTitle').innerText = 'Sửa thông tin tuyến';
-            document.getElementById('routeModal').classList.add('show');
-        }
-        
-        function deleteRoute(id) {
-            if(confirm('Bạn có chắc chắn muốn xóa tuyến này?')) {
-                alert('Đã xóa tuyến!');
-            }
-        }
+        window.routeFormHasErrors = @json($errors->any());
     </script>
+    
+    <script src="{{ asset('js/admin.js') }}"></script>
 </body>
 </html>

@@ -27,7 +27,7 @@
                 @if($errors->any())
                     <div class="error-box">
                         @foreach($errors->all() as $error)
-                            <p class="error-text">{{ $error }}</p>
+                            <p class="error-text"><i class="fas fa-exclamation-circle"></i> {{ $error }}</p>
                         @endforeach
                     </div>
                 @endif
@@ -38,29 +38,33 @@
                         
                         <div class="form-group">
                             <label class="form-label">Họ và tên <span class="required">*</span></label>
-                            <input type="text" name="fullName" value="{{ old('fullName') }}" required class="form-input">
+                            <input type="text" name="hoten" value="{{ old('hoten') }}" required class="form-input" placeholder="Nhập họ và tên">
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label">Số điện thoại <span class="required">*</span></label>
-                            <input type="text" name="username" value="{{ old('username') }}" required class="form-input">
+                            <input type="text" name="phone" value="{{ old('phone') }}" required class="form-input" placeholder="Nhập số điện thoại">
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label">Email</label>
-                            <input type="email" name="email" value="{{ old('email') }}" class="form-input">
+                            <input type="email" name="email" value="{{ old('email') }}" class="form-input" placeholder="Nhập email (không bắt buộc)">
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label">Mật khẩu <span class="required">*</span></label>
-                            <input type="password" name="password" required class="form-input">
+                            <div class="password-wrapper">
+                                <input type="password" name="password" required class="form-input" id="password" placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)">
+                                <i class="fas fa-eye toggle-password" onclick="togglePassword('password')"></i>
+                            </div>
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label">Vai trò <span class="required">*</span></label>
                             <select name="role" required class="form-select">
-                                <option value="user">Người dùng</option>
-                                <option value="admin">Quản trị viên</option>
+                                <option value="khach_hang" {{ old('role') == 'khach_hang' ? 'selected' : '' }}>Khách hàng</option>
+                                <option value="tai_xe" {{ old('role') == 'tai_xe' ? 'selected' : '' }}>Tài xế</option>
+                                <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Quản trị viên</option>
                             </select>
                         </div>
                         
@@ -77,5 +81,8 @@
             </div>
         </main>
     </div>
+
+    <script src="{{ asset('js/admin.js') }}"></script>
+    
 </body>
 </html>

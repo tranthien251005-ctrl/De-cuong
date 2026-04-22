@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Ghe;
 use App\Models\TuyenXe;
 use App\Models\Ve;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -29,7 +32,7 @@ class PaymentController extends Controller
             $seatIds = Ghe::where('maxe', $tuyen->maxe)
                 ->whereIn('tenghe', $seats)
                 ->pluck('maghe')
-                ->map(fn ($id) => (int) $id)
+                ->map(fn($id) => (int) $id)
                 ->all();
         }
 
@@ -81,6 +84,8 @@ class PaymentController extends Controller
         }
 
         try {
+            DB::beginTransaction();
+
             $ngayDat = !empty($validated['travel_date'])
                 ? date('Y-m-d H:i:s', strtotime($validated['travel_date']))
                 : now()->format('Y-m-d H:i:s');
@@ -93,14 +98,20 @@ class PaymentController extends Controller
                 throw new \RuntimeException('Ghế không hợp lệ cho tuyến xe này.');
             }
 
-            if ($ghes->contains(fn ($ghe) => $ghe->trangthai === 'da_dat')) {
+            if ($ghes->contains(fn($ghe) => $ghe->trangthai === 'da_dat')) {
                 throw new \RuntimeException('Một số ghế đã được đặt. Vui lòng chọn ghế khác.');
             }
 
             foreach ($ghes as $ghe) {
+                // Tạo vé
                 $this->createTicket($ghe, (int) $accountId, $ngayDat, (int) ($tuyen->giatien ?? 0), $validated['payment_method']);
-                $ghe->update(['trangthai' => 'da_dat']);
+
+                // Cập nhật trạng thái ghế
+                $ghe->trangthai = 'da_dat';
+                $ghe->save();
             }
+
+            DB::commit();
 
             session()->forget('payment');
 
@@ -108,23 +119,30 @@ class PaymentController extends Controller
                 ->route('home')
                 ->with('success', 'Vé của bạn đã được lưu. Bạn có thể xem lại trong mục Hóa đơn.');
         } catch (\RuntimeException $e) {
+            DB::rollBack();
             return back()->withErrors([$e->getMessage()]);
         } catch (\Throwable $e) {
-            report($e);
-            return back()->withErrors([$e->getMessage()]);
+            DB::rollBack();
+            Log::error('Payment error: ' . $e->getMessage());
+            return back()->withErrors(['Có lỗi xảy ra, vui lòng thử lại sau!']);
         }
     }
 
+    /**
+     * Tạo vé mới
+     */
     private function createTicket(Ghe $ghe, int $accountId, string $ngayDat, int $total, string $paymentMethod): void
     {
+        // Xác định trạng thái dựa vào phương thức thanh toán
+        $trangThai = $paymentMethod === 'chuyen_khoan' ? 'da_thanh_toan' : 'cho_thanh_toan';
+
         Ve::create([
-            'mave' => ((int) Ve::max('mave')) + 1,
             'maghe' => $ghe->maghe,
             'mataikhoan' => $accountId,
             'ngaydat' => $ngayDat,
             'hinhthucthanhtoan' => $paymentMethod,
             'tongsotien' => $total,
-            'trangthai' => 'cho_don',
+            'trangthai' => $trangThai,
         ]);
     }
 }

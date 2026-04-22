@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\BillController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
@@ -26,9 +27,7 @@ Route::middleware('role')->group(function () {
     Route::get('/payment/{matuyen?}', [PaymentController::class, 'show'])->name('payment');
     Route::post('/payment/{matuyen}/confirm', [PaymentController::class, 'confirm'])->name('payment.confirm');
 
-    Route::get('/bill', function () {
-        return view('layouts.bill');
-    })->name('bill');
+    Route::get('/bill', [BillController::class, 'index'])->name('bill');
 });
 
 // Admin (role = admin)

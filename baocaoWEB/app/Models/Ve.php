@@ -15,7 +15,8 @@ class Ve extends Model
         'maghe',
         'mataikhoan',
         'ngaydat',
-        'trangthaithanhtoan',
+        'hinhthucthanhtoan',
         'tongsotien',
+        'trangthai',
     ];
 }

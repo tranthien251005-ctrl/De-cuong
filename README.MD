@@ -1,164 +1,135 @@
-# 🚌 Website Ban Ve Xe Bus
+# Website Bán Vé Xe Bus
 
-> 🎓 De tai bao cao cuoi ky web nang cao - Lop LTWNC-D18CNPM2
+> Đề tài báo cáo cuối kỳ môn Web nâng cao - Lớp LTWNC-D18CNPM2
 
-## 📌 Tong quan
+## Tổng Quan
 
-Day la du an xay dung website dat ve xe bus, trong do phan ung dung web duoc phat trien bang Laravel va luu trong thu muc `baocaoWEB`. Thu muc goc cua repo dong vai tro tap hop tai lieu de cuong, bao cao tien do va file huong dan.
+Đây là dự án website đặt vé xe bus, phần ứng dụng web được phát triển bằng Laravel và lưu trong thư mục `baocaoWEB`.
 
-Muc tieu cua he thong:
+Mục tiêu của hệ thống:
 
-- 🔎 Ho tro nguoi dung tim kiem chuyen xe, xem lich trinh va thuc hien dat ve online.
-- 🔐 Cung cap giao dien dang nhap cho khach hang va tai khoan quan tri demo.
-- 🚀 Lam nen tang de phat trien tiep cac chuc nang quan ly chuyen xe, ghe ngoi, ve va nguoi dung.
+- Hỗ trợ người dùng tìm kiếm tuyến xe theo điểm đi, điểm đến và thời gian dự kiến.
+- Cho phép đăng ký, đăng nhập, đăng xuất tài khoản người dùng.
+- Cho phép chọn ghế, thanh toán/đặt vé và lưu vé vào cơ sở dữ liệu.
+- Cho phép người dùng xem lại hóa đơn/vé đã đặt theo tài khoản đăng nhập.
+- Cung cấp giao diện quản trị cơ bản cho các màn hình quản lý.
 
-## 👥 Thanh vien nhom
+## Thành Viên Nhóm
 
-| STT | Ho va ten       | MSSV        | Vai tro     |
+| STT | Họ và tên       | MSSV        | Vai trò     |
 | --- | --------------- | ----------- | ----------- |
-| 1   | Pham Dinh Luan  | 23810310282 | Nhom truong |
-| 2   | Tran Ngoc Thien | 23810310271 | Thanh vien  |
+| 1   | Phạm Đình Luân  | 23810310282 | Nhóm trưởng |
+| 2   | Trần Ngọc Thiện | 23810310271 | Thành viên  |
 
-## 🛠️ Cong nghe su dung
+## Công Nghệ Sử Dụng
 
-| Thanh phan | Cong nghe                                                                                      |
-| ---------- | ---------------------------------------------------------------------------------------------- |
-| Backend    | Laravel 12, PHP 8.2                                                                            |
-| Frontend   | Blade, HTML, CSS, JavaScript                                                                   |
-| Build tool | Vite, NPM                                                                                      |
-| Du lieu    | Supabase REST API cho dang nhap; cac migration mac dinh cua Laravel van duoc giu trong project |
-| Du lieu    | PHPMYADMIN                                                                                     |
+| Thành phần | Công nghệ |
+| ---------- | --------- |
+| Backend | Laravel 12, PHP 8.2 |
+| Frontend | Blade, HTML, CSS, JavaScript |
+| Cơ sở dữ liệu | PostgreSQL/Supabase |
+| Quản lý phụ thuộc | Composer, NPM |
 
-## 📘 Tai lieu dac ta phan mem
+## Tài Liệu Đặc Tả Phần Mềm
 
-### 1. 🎯 Muc tieu va pham vi
+### 1. Mục Tiêu Và Phạm Vi
 
-He thong huong den bai toan dat ve xe bus tren web cho 2 nhom nguoi dung:
+Hệ thống hướng đến bài toán đặt vé xe bus trên web cho 2 nhóm người dùng:
 
-- Khach hang: xem thong tin tuyen xe, dang nhap va thao tac dat ve.
-- Quan tri vien: duoc dinh huong de quan ly nguoi dung, chuyen xe, ve va bao cao.
+- Khách hàng: đăng ký, đăng nhập, tìm kiếm tuyến xe, chọn ghế, đặt vé và xem hóa đơn.
+- Quản trị viên: truy cập khu vực quản trị và các màn hình quản lý dữ liệu.
 
-Pham vi hien tai cua repo tap trung vao giao dien va luong co ban:
+Phạm vi hiện tại của dự án đã cập nhật:
 
-- Trang chu hien thi danh sach tuyen xe mau.
-- Trang dang nhap co xac thuc bang so dien thoai va mat khau.
-- Trang dat ve co tim chuyen, chon ngay, chon ghe va tinh tong tien o muc demo giao dien.
+- Trang chủ hiển thị danh sách tuyến xe từ database.
+- Form tìm kiếm tuyến xe theo điểm đi, điểm đến và thời gian dự kiến.
+- Trang chọn ghế theo tuyến xe.
+- Trang thanh toán/đặt vé và lưu dữ liệu vé vào bảng `ve`.
+- Trang hóa đơn hiển thị vé đã đặt theo tài khoản đăng nhập.
+- Header, footer, giao diện home, hóa đơn và thanh toán đã được chỉnh lại.
 
-### 2. 👤 Tac nhan he thong
+### 2. Tác Nhân Hệ Thống
 
-| Tac nhan              | Mo ta                                                                                      |
-| --------------------- | ------------------------------------------------------------------------------------------ |
-| Khach vang lai        | Truy cap trang chu, xem giao dien, mo trang dang nhap/dat ve                               |
-| Nguoi dung da dang ky | Dang nhap bang thong tin tai khoan luu tren Supabase                                       |
-| Admin demo            | Dang nhap bang tai khoan `admin / 12345678`, duoc dieu huong sang khu vuc quan tri du kien |
+| Tác nhân | Mô tả |
+| -------- | ----- |
+| Khách vãng lai | Truy cập trang chủ, xem danh sách tuyến xe, mở trang đăng nhập/đăng ký |
+| Người dùng đã đăng ký | Đăng nhập, tìm chuyến, chọn ghế, đặt vé và xem hóa đơn |
+| Quản trị viên | Truy cập khu vực quản trị và các màn hình quản lý cơ bản |
 
-### 3. ✅ Yeu cau chuc nang
+### 3. Yêu Cầu Chức Năng
 
-| Ma        | Chuc nang                        | Mo ta                                                                                                               | Trang thai      |
-| --------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------- |
-| AUTH-01   | Dang nhap                        | Nguoi dung dang nhap bang so dien thoai va mat khau; du lieu hien dang doc tu bang `taiKhoan` qua Supabase REST API | Da co ban       |
-| AUTH-02   | Dang xuat                        | Xoa session dang nhap va dieu huong ve trang dang nhap                                                              | Da co ban       |
-| HOME-01   | Trang chu                        | Hien thi header, footer, khu vuc hero, danh sach cac tuyen xe mau va nut dat ve                                     | Da co ban       |
-| SEARCH-01 | Tim chuyen xe                    | Chon diem di, diem den, ngay di o trang chu va trang dat ve                                                         | Demo giao dien  |
-| BOOK-01   | Dat ve                           | Chon ghe, xem thong tin chuyen, tinh tong tien va xac nhan dat ve bang thong bao client-side                        | Demo giao dien  |
-| AUTH-03   | Dang ky                          | Da co file view mau `resources/views/auth/register.blade.php` nhung chua co controller va route hoat dong           | Dang phat trien |
-| AUTH-04   | Quen mat khau                    | Route da duoc khai bao nhung chua co view xu ly                                                                     | Chua hoan tat   |
-| ADMIN-01  | Quan tri he thong                | Luong admin moi dung o muc dang nhap demo; route/man hinh `/admin` chua duoc dinh nghia trong repo hien tai         | Chua trien khai |
-| DATA-01   | Dong bo du lieu chuyen xe/ve/ghe | Chua co API va model nghiep vu rieng cho dat ve, chuyen xe, ghe ngoi                                                | Chua trien khai |
+| Mã | Chức năng | Mô tả | Trạng thái |
+| --- | --------- | ----- | ---------- |
+| AUTH-01 | Đăng nhập | Người dùng đăng nhập bằng số điện thoại và mật khẩu, lưu thông tin vào session | Đã hoàn thành |
+| AUTH-02 | Đăng xuất | Xóa session đăng nhập và điều hướng người dùng khỏi phiên hiện tại | Đã hoàn thành |
+| AUTH-03 | Đăng ký | Người dùng đăng ký tài khoản bằng số điện thoại, mật khẩu và thông tin cá nhân | Đã hoàn thành |
+| HOME-01 | Trang chủ | Hiển thị hero, bộ lọc tìm chuyến, danh sách tuyến xe, header và footer | Đã hoàn thành |
+| SEARCH-01 | Tìm tuyến xe | Lọc tuyến xe theo điểm đi, điểm đến và thời gian dự kiến từ cột `thoigiandukien` | Đã hoàn thành |
+| ROUTE-01 | Hiển thị tuyến xe | Hiển thị tên tuyến, điểm đi, điểm đến, thời gian dự kiến, khoảng cách và giá vé từ database | Đã hoàn thành |
+| BOOK-01 | Chọn ghế | Người dùng chọn ghế theo tuyến xe, hệ thống kiểm tra ghế đã đặt và ghế còn trống | Đã hoàn thành |
+| PAYMENT-01 | Thanh toán/đặt vé | Xác nhận đặt vé, lưu dữ liệu vào bảng `ve`, cập nhật trạng thái ghế đã đặt | Đã hoàn thành |
+| PAYMENT-02 | Thông báo đặt vé | Sau khi đặt vé thành công, trang home hiển thị thông báo “Đặt vé thành công” | Đã hoàn thành |
+| BILL-01 | Hóa đơn | Hiển thị danh sách hóa đơn/vé của tài khoản đang đăng nhập, không dùng dữ liệu mẫu | Đã hoàn thành |
+| BILL-02 | Lọc hóa đơn | Lọc hóa đơn theo trạng thái chờ đón/đã đi trên giao diện | Đã hoàn thành |
+| UI-01 | Header dùng chung | Cập nhật header mới, có logo, điều hướng, trạng thái active và nút đăng nhập/đăng xuất | Đã hoàn thành |
+| ADMIN-01 | Giao diện quản trị | Có các view quản trị cơ bản cho người dùng, xe, tuyến, chuyến, vé, thanh toán, báo cáo | Đã hoàn thành |
 
-### 4. 🔒 Yeu cau phi chuc nang
+### 4. Yêu Cầu Phi Chức Năng
 
-- Giao dien phai hien thi duoc tren trinh duyet desktop va mobile co ban.
-- Form dang nhap co kiem tra du lieu dau vao truoc khi xu ly.
-- Session duoc dung de luu trang thai dang nhap.
-- Cau hinh nhay cam duoc tach trong file `.env`, dac biet la `SUPABASE_URL` va `SUPABASE_ANON_KEY`.
-- Cau truc project giu dung convention cua Laravel de de mo rong ve sau.
+- Giao diện hiển thị được trên trình duyệt desktop và mobile.
+- Form đăng nhập, đăng ký và thanh toán có kiểm tra dữ liệu đầu vào.
+- Session được dùng để lưu trạng thái đăng nhập.
+- Thông tin cấu hình nhạy cảm được tách trong file `.env`.
+- Mã nguồn giữ theo cấu trúc Laravel để dễ mở rộng và bảo trì.
 
-### 5. 🧩 Rang buoc va hien trang ky thuat
+### 5. Cấu Trúc Database Chính
 
-- Chuc nang dat ve hien tai chu yeu la demo giao dien, chua ghi du lieu dat ve xuong co so du lieu.
-- Du an chua co `routes/api.php` va chua xay dung lop service nghiep vu rieng.
-- Chuc nang dang ky va quen mat khau moi o muc khung giao dien/route, chua du de van hanh thuc te.
-- Tai lieu trong `reports/` la minh chung tien do va anh chup man hinh cho qua trinh phat trien.
+Dự án đang sử dụng các bảng nghiệp vụ chính:
 
-## 📂 Cau truc thu muc du an
+- `taikhoan`: lưu tài khoản, số điện thoại, mật khẩu, vai trò, email, họ tên.
+- `tuyenxe`: lưu tuyến xe, điểm đi, điểm đến, thời gian dự kiến, khoảng cách, giá tiền, xe.
+- `xe`: lưu thông tin xe.
+- `vitrighe`: lưu vị trí ghế, trạng thái ghế và xe tương ứng.
+- `ve`: lưu vé đã đặt gồm ghế, tài khoản, ngày đặt, hình thức thanh toán, tổng số tiền và trạng thái.
+- `nguoidung`, `taixe`, `chuyenxe`: các bảng mở rộng cho nghiệp vụ người dùng, tài xế và chuyến xe.
 
-### 1. 🗂️ Thu muc goc
+## Cấu Trúc Thư Mục Dự Án
 
 ```text
 du an/
 |-- README.MD
 |-- DECUONG.MD
 |-- reports/
-|   |-- REPORT_20260403.md
-|   `-- images/
 `-- baocaoWEB/
+    |-- app/
+    |   |-- Http/Controllers/
+    |   `-- Models/
+    |-- public/
+    |   `-- css/
+    |-- resources/
+    |   `-- views/
+    |       |-- auth/
+    |       |-- layouts/
+    |       |-- pages/
+    |       `-- admin/
+    |-- routes/
+    |   `-- web.php
+    |-- database/
+    |-- artisan
+    |-- composer.json
+    `-- package.json
 ```
 
-Y nghia:
+## Hướng Dẫn Cài Đặt
 
-- 📄 `README.MD`: tai lieu tong quan du an, dac ta rut gon va huong dan cai dat.
-- 📝 `DECUONG.MD`: de cuong mon hoc va danh sach chuc nang nghiep vu mong muon.
-- 🖼️ `reports/`: bao cao tien do theo ngay va anh chup giao dien.
-- 💻 `baocaoWEB/`: ma nguon ung dung Laravel.
+### 1. Yêu Cầu Môi Trường
 
-### 2. 🏗️ Cau truc chinh trong `baocaoWEB`
-
-```text
-baocaoWEB/
-|-- app/
-|   |-- Http/Controllers/
-|   |   `-- LoginController.php
-|   |-- Models/
-|   `-- Providers/
-|-- bootstrap/
-|-- config/
-|-- database/
-|   |-- factories/
-|   |-- migrations/
-|   `-- seeders/
-|-- public/
-|   |-- css/
-|   `-- index.php
-|-- resources/
-|   |-- css/
-|   |-- js/
-|   `-- views/
-|       |-- auth/
-|       |-- layouts/
-|       `-- pages/
-|-- routes/
-|   |-- console.php
-|   `-- web.php
-|-- storage/
-|-- tests/
-|-- artisan
-|-- composer.json
-|-- package.json
-`-- vite.config.js
-```
-
-Mo ta nhanh:
-
-- ⚙️ `app/Http/Controllers/`: xu ly request; hien tai tap trung vao dang nhap.
-- 🔐 `resources/views/auth/`: giao dien dang nhap va khung dang ky.
-- 🏠 `resources/views/layouts/`: giao dien trang chu va trang dat ve.
-- 🧱 `resources/views/pages/`: header va footer dung chung.
-- 🎨 `public/css/`: file CSS thu cong cho trang chu, dang nhap va dat ve.
-- 🛣️ `routes/web.php`: dinh nghia cac route giao dien web.
-- 🗃️ `database/migrations/`: migration mac dinh cua Laravel, san sang cho viec mo rong CSDL.
-- 🧪 `tests/`: bo test mac dinh cua Laravel, chua co test nghiep vu rieng.
-
-## ⚙️ Huong dan cai dat
-
-### 1. 🧰 Yeu cau moi truong
-
-- PHP 8.2 tro len
+- PHP 8.2 trở lên
 - Composer
-- Node.js va NPM
-- Tai khoan Supabase neu muon kiem thu luong dang nhap nguoi dung thuc
+- Node.js và NPM
+- Database PostgreSQL/Supabase
 
-### 2. 📥 Cai dat du an
+### 2. Cài Đặt Dự Án
 
 ```bash
 cd baocaoWEB
@@ -168,45 +139,47 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Neu dung PowerShell tren Windows, co the thay lenh sao chep `.env` bang:
+Nếu dùng PowerShell trên Windows:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-### 3. 🔑 Cau hinh bien moi truong
+### 3. Cấu Hình `.env`
 
-Cap nhat it nhat cac bien sau trong file `.env`:
+Cập nhật thông tin kết nối database và các cấu hình cần thiết trong file:
 
 ```env
 APP_NAME="Website Ban Ve Xe Bus"
 APP_URL=http://127.0.0.1:8000
 
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
+DB_CONNECTION=pgsql
+DB_HOST=your-host
+DB_PORT=6543
+DB_DATABASE=postgres
+DB_USERNAME=postgres
+DB_PASSWORD=your-password
 ```
 
-Neu can su dung cac bang mac dinh cua Laravel:
-
-```bash
-php artisan migrate
-```
-
-### 4. ▶️ Chay ung dung
+### 4. Chạy Ứng Dụng
 
 ```bash
 npm run dev
 php artisan serve
 ```
 
-Truy cap: `http://127.0.0.1:8000`
+Truy cập:
 
-## 🔗 Tai lieu lien quan
+```text
+http://127.0.0.1:8000
+```
 
-- [De cuong mon hoc](./DECUONG.MD)
-- [Bao cao ngay 03/04/2026](./reports/REPORT_20260403.md)
+## Tài Liệu Liên Quan
 
-## 📌 Ghi chu
+- [Đề cương môn học](./DECUONG.MD)
+- [Báo cáo ngày 03/04/2026](./reports/REPORT_20260403.md)
 
-- README nay duoc viet theo trang thai code hien co trong repo, khong mo ta vuot qua nhung gi dang ton tai.
-- Neu bo sung cac module nhu dang ky, admin, quan ly chuyen xe hoac thanh toan, can cap nhat lai bang yeu cau chuc nang va cau truc thu muc.
+## Ghi Chú
+
+- README đã được cập nhật theo trạng thái chức năng hiện tại của dự án.
+- Các chức năng trong bảng yêu cầu chức năng đã được đánh dấu `Đã hoàn thành` cho những phần đã triển khai trong source code.

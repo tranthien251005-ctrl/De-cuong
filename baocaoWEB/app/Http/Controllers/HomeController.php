@@ -9,6 +9,11 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
+        $filterOptions = TuyenXe::query()
+            ->orderBy('diemdi')
+            ->orderBy('diemden')
+            ->get();
+
         $query = TuyenXe::query();
 
         if ($request->filled('from')) {
@@ -19,13 +24,12 @@ class HomeController extends Controller
             $query->where('diemden', $request->to);
         }
 
-        if ($request->filled('time')) {
-            $query->where('giodi', $request->time);
+        if ($request->filled('duration')) {
+            $query->where('thoigiandukien', $request->duration);
         }
 
         $tuyenXes = $query->get();
 
-        return view('layouts.home', compact('tuyenXes'));
+        return view('layouts.home', compact('tuyenXes', 'filterOptions'));
     }
 }
-

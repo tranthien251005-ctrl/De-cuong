@@ -106,7 +106,7 @@ class PaymentController extends Controller
 
             return redirect()
                 ->route('home')
-                ->with('success', 'Thanh toán thành công! Vé của bạn đã được lưu.');
+                ->with('success', 'Vé của bạn đã được lưu. Bạn có thể xem lại trong mục Hóa đơn.');
         } catch (\RuntimeException $e) {
             return back()->withErrors([$e->getMessage()]);
         } catch (\Throwable $e) {
@@ -117,17 +117,14 @@ class PaymentController extends Controller
 
     private function createTicket(Ghe $ghe, int $accountId, string $ngayDat, int $total, string $paymentMethod): void
     {
-        $ticket = [
+        Ve::create([
+            'mave' => ((int) Ve::max('mave')) + 1,
             'maghe' => $ghe->maghe,
             'mataikhoan' => $accountId,
             'ngaydat' => $ngayDat,
-            'trangthaithanhtoan' => $paymentMethod,
+            'hinhthucthanhtoan' => $paymentMethod,
             'tongsotien' => $total,
-        ];
-
-        Ve::create([
-            'mave' => ((int) Ve::max('mave')) + 1,
-            ...$ticket,
+            'trangthai' => 'cho_don',
         ]);
     }
 }

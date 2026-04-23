@@ -5,7 +5,7 @@
         </h1>
         <p>Administration Panel</p>
     </div>
-    
+
     <nav class="sidebar-nav">
         <a href="{{ route('admin.dashboard') }}" class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
             <i class="fas fa-chart-line"></i>
@@ -31,24 +31,8 @@
             <i class="fas fa-ticket-alt"></i>
             <span>Quản lý vé</span>
         </a>
-        <a href="{{ route('admin.payments') }}" class="sidebar-item {{ request()->routeIs('admin.payments*') ? 'active' : '' }}">
-            <i class="fas fa-credit-card"></i>
-            <span>Quản lý thanh toán</span>
-        </a>
-        <a href="{{ route('admin.promotions') }}" class="sidebar-item {{ request()->routeIs('admin.promotions*') ? 'active' : '' }}">
-            <i class="fas fa-gift"></i>
-            <span>Khuyến mãi</span>
-        </a>
-        <a href="{{ route('admin.reports') }}" class="sidebar-item {{ request()->routeIs('admin.reports*') ? 'active' : '' }}">
-            <i class="fas fa-chart-bar"></i>
-            <span>Báo cáo thống kê</span>
-        </a>
-        <a href="{{ route('admin.settings') }}" class="sidebar-item {{ request()->routeIs('admin.settings*') ? 'active' : '' }}">
-            <i class="fas fa-cog"></i>
-            <span>Cài đặt hệ thống</span>
-        </a>
     </nav>
-    
+
     <div class="sidebar-footer">
         <form method="POST" action="{{ route('logout') }}">
             @csrf

@@ -67,12 +67,12 @@ Phạm vi hiện tại của dự án đã cập nhật:
 | SEARCH-01  | Tìm tuyến xe       | Lọc tuyến xe theo điểm đi, điểm đến và thời gian dự kiến từ cột `thoigiandukien`            | Đã hoàn thành |
 | ROUTE-01   | Hiển thị tuyến xe  | Hiển thị tên tuyến, điểm đi, điểm đến, thời gian dự kiến, khoảng cách và giá vé từ database | Đã hoàn thành |
 | BOOK-01    | Chọn ghế           | Người dùng chọn ghế theo tuyến xe, hệ thống kiểm tra ghế đã đặt và ghế còn trống            | Đã hoàn thành |
-| PAYMENT-01 | Thanh toán/đặt vé  | Xác nhận đặt vé, lưu dữ liệu vào bảng `ve`, cập nhật trạng thái ghế đã đặt                  | Đã hoàn thành |
+| PAYMENT-01 | Thanh toán/đặt vé  | Xác nhận đặt vé, lưu dữ liệu vào bảng `ve`, cập nhật trạng thái ghế đã đặt                  | Đang cập nhật |
 | PAYMENT-02 | Thông báo đặt vé   | Sau khi đặt vé thành công, trang home hiển thị thông báo “Đặt vé thành công”                | Đã hoàn thành |
 | BILL-01    | Hóa đơn            | Hiển thị danh sách hóa đơn/vé của tài khoản đang đăng nhập, không dùng dữ liệu mẫu          | Đã hoàn thành |
 | BILL-02    | Lọc hóa đơn        | Lọc hóa đơn theo trạng thái chờ đón/đã đi trên giao diện                                    | Đã hoàn thành |
 | UI-01      | Header dùng chung  | Cập nhật header mới, có logo, điều hướng, trạng thái active và nút đăng nhập/đăng xuất      | Đã hoàn thành |
-| ADMIN-01   | Giao diện quản trị | Có các view quản trị cơ bản cho người dùng, xe, tuyến, chuyến, vé, thanh toán, báo cáo      | Đã hoàn thành |
+| ADMIN-01   | Giao diện quản trị | Có các view quản trị cơ bản cho người dùng, xe, tuyến, chuyến, vé     | Đang cập nhật |
 
 ### 4. Yêu Cầu Phi Chức Năng
 

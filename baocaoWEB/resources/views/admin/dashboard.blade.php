@@ -11,57 +11,56 @@
 <body class="font-['Inter']">
     <div class="admin-container">
         @include('admin.partials.sidebar')
-        
+
         <main class="admin-main">
             <div class="main-content">
                 <div class="page-header">
                     <h1>Dashboard</h1>
                     <p>Chào mừng bạn đến với trang quản trị</p>
                 </div>
-                
-                <!-- Stats Cards -->
+
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-card-content">
                             <div>
                                 <p class="stat-label">Tổng người dùng</p>
-                                <p class="stat-value">1,234</p>
+                                <p class="stat-value">{{ number_format($totalUsers ?? 0) }}</p>
                             </div>
                             <div class="stat-icon bg-blue-100">
                                 <i class="fas fa-users text-blue-600"></i>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="stat-card">
                         <div class="stat-card-content">
                             <div>
                                 <p class="stat-label">Tổng tuyến xe</p>
-                                <p class="stat-value">12</p>
+                                <p class="stat-value">{{ number_format($totalRoutes ?? 0) }}</p>
                             </div>
                             <div class="stat-icon bg-green-100">
                                 <i class="fas fa-route text-green-600"></i>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="stat-card">
                         <div class="stat-card-content">
                             <div>
                                 <p class="stat-label">Đơn hàng hôm nay</p>
-                                <p class="stat-value">45</p>
+                                <p class="stat-value">{{ number_format($todayOrders ?? 0) }}</p>
                             </div>
                             <div class="stat-icon bg-orange-100">
                                 <i class="fas fa-ticket-alt text-orange-600"></i>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="stat-card">
                         <div class="stat-card-content">
                             <div>
                                 <p class="stat-label">Doanh thu tháng</p>
-                                <p class="stat-value">45.2M</p>
+                                <p class="stat-value">{{ number_format($monthlyRevenue ?? 0, 0, ',', '.') }}đ</p>
                             </div>
                             <div class="stat-icon bg-purple-100">
                                 <i class="fas fa-chart-line text-purple-600"></i>
@@ -69,38 +68,31 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Recent Activity -->
+
                 <div class="recent-activity">
                     <h2 class="activity-title">Hoạt động gần đây</h2>
                     <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-icon bg-green-100">
-                                <i class="fas fa-user-plus text-green-600"></i>
+                        @forelse($recentActivities as $activity)
+                            <div class="activity-item">
+                                <div class="activity-icon {{ $activity['icon_bg'] }}">
+                                    <i class="{{ $activity['icon'] }} {{ $activity['icon_color'] }}"></i>
+                                </div>
+                                <div class="activity-text">
+                                    <p class="activity-name">{{ $activity['name'] }}</p>
+                                    <p class="activity-time">{{ $activity['time'] }}</p>
+                                </div>
                             </div>
-                            <div class="activity-text">
-                                <p class="activity-name">Người dùng mới đăng ký: Nguyễn Văn A</p>
-                                <p class="activity-time">2 phút trước</p>
+                        @empty
+                            <div class="activity-item">
+                                <div class="activity-icon bg-blue-100">
+                                    <i class="fas fa-database text-blue-600"></i>
+                                </div>
+                                <div class="activity-text">
+                                    <p class="activity-name">Chưa có dữ liệu hoạt động</p>
+                                    <p class="activity-time">Hệ thống sẽ cập nhật khi có dữ liệu mới</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon bg-blue-100">
-                                <i class="fas fa-shopping-cart text-blue-600"></i>
-                            </div>
-                            <div class="activity-text">
-                                <p class="activity-name">Đơn hàng mới: #ORD-001234</p>
-                                <p class="activity-time">15 phút trước</p>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon bg-yellow-100">
-                                <i class="fas fa-edit text-yellow-600"></i>
-                            </div>
-                            <div class="activity-text">
-                                <p class="activity-name">Cập nhật tuyến xe: Hà Nội - Nam Định</p>
-                                <p class="activity-time">1 giờ trước</p>
-                            </div>
-                        </div>
+                        @endforelse
                     </div>
                 </div>
             </div>

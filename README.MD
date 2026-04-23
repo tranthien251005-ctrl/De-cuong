@@ -72,7 +72,7 @@ Phạm vi hiện tại của dự án đã cập nhật:
 | BILL-01    | Hóa đơn            | Hiển thị danh sách hóa đơn/vé của tài khoản đang đăng nhập, không dùng dữ liệu mẫu          | Đã hoàn thành |
 | BILL-02    | Lọc hóa đơn        | Lọc hóa đơn theo trạng thái chờ đón/đã đi trên giao diện                                    | Đã hoàn thành |
 | UI-01      | Header dùng chung  | Cập nhật header mới, có logo, điều hướng, trạng thái active và nút đăng nhập/đăng xuất      | Đã hoàn thành |
-| ADMIN-01   | Giao diện quản trị | Có các view quản trị cơ bản cho người dùng, xe, tuyến, chuyến, vé     | Đang cập nhật |
+| ADMIN-01   | Giao diện quản trị | Có các view quản trị cơ bản cho người dùng, xe, tuyến, chuyến, vé     | Đã hoàn thành|
 
 ### 4. Yêu Cầu Phi Chức Năng
 

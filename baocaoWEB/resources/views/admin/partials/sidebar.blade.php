@@ -1,15 +1,15 @@
 <aside class="admin-sidebar">
     <div class="sidebar-header">
         <h1>
-            <i class="fas fa-bus"></i> MY BUS
+            <i class="fas fa-bus"></i> CHÚ THIỆN
         </h1>
-        <p>Administration Panel</p>
+        <p>An toàn - Nhanh chóng - Tiện lợi</p>
     </div>
 
     <nav class="sidebar-nav">
         <a href="{{ route('admin.dashboard') }}" class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
             <i class="fas fa-chart-line"></i>
-            <span>Dashboard</span>
+            <span>Bảng điều khiển</span>
         </a>
         <a href="{{ route('admin.users') }}" class="sidebar-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
             <i class="fas fa-users"></i>

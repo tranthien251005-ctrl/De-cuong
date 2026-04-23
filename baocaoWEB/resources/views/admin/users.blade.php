@@ -35,6 +35,14 @@
                         <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
                     </div>
                 @endif
+
+                @if($errors->any())
+                    <div class="alert-error">
+                        @foreach($errors->all() as $error)
+                            <p><i class="fas fa-exclamation-circle"></i> {{ $error }}</p>
+                        @endforeach
+                    </div>
+                @endif
                 
                 <!-- Bộ lọc -->
                 <div class="filter-section">
@@ -133,7 +141,7 @@
                     <label class="form-label">Email</label>
                     <input type="email" id="email" name="email" class="form-input" placeholder="Nhập email (không bắt buộc)">
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="passwordGroup">
                     <label class="form-label">Mật khẩu <span class="required">*</span></label>
                     <div class="password-wrapper">
                         <input type="password" id="password" name="password" class="form-input" placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" required>

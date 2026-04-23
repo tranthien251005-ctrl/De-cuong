@@ -35,6 +35,14 @@
                         <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
                     </div>
                 @endif
+
+                @if($errors->any())
+                    <div class="alert-error">
+                        @foreach($errors->all() as $error)
+                            <p><i class="fas fa-exclamation-circle"></i> {{ $error }}</p>
+                        @endforeach
+                    </div>
+                @endif
                 
                 <!-- Filter -->
                 <div class="filter-section">

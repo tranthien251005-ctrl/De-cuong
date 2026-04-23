@@ -59,6 +59,7 @@
         margin: 0;
         color: #0f2b3d;
         font-size: 18px;
+        text-align: center;
         line-height: 1.1;
         font-weight: 800;
         letter-spacing: 0;

@@ -19,14 +19,6 @@
                         <h1>Quản lý vé</h1>
                         <p>Danh sách tất cả vé đã bán</p>
                     </div>
-                    <div class="action-group" style="gap: 0.75rem;">
-                        <a href="{{ route('admin.tickets.export') }}" class="btn-primary">
-                            <i class="fas fa-file-excel"></i> Xuất Excel
-                        </a>
-                        <button onclick="window.print()" class="btn-outline">
-                            <i class="fas fa-print"></i> In báo cáo
-                        </button>
-                    </div>
                 </div>
 
                 @if(session('success'))
@@ -67,7 +59,7 @@
                     <div class="stat-card">
                         <div class="stat-card-content">
                             <div>
-                                <p class="stat-label">Đã thanh toán</p>
+                                <p class="stat-label">Đã đi</p>
                                 <p class="stat-value">{{ $daThanhToan ?? 0 }}</p>
                             </div>
                             <div class="stat-icon bg-success-100">
@@ -78,7 +70,7 @@
                     <div class="stat-card">
                         <div class="stat-card-content">
                             <div>
-                                <p class="stat-label">Chờ thanh toán</p>
+                                <p class="stat-label">Chờ đón</p>
                                 <p class="stat-value">{{ $choThanhToan ?? 0 }}</p>
                             </div>
                             <div class="stat-icon bg-warning-100">
@@ -94,9 +86,8 @@
                         <input type="date" id="filterDateTo" class="filter-input" placeholder="Đến ngày">
                         <select id="filterStatus" class="filter-select">
                             <option value="">Tất cả trạng thái</option>
-                            <option value="da_thanh_toan">Đã thanh toán</option>
-                            <option value="cho_thanh_toan">Chờ thanh toán</option>
-                            <option value="da_huy">Đã hủy</option>
+                            <option value="cho_don">Chờ đón</option>
+                            <option value="da_di">Đã đi</option>
                         </select>
                         <input type="text" id="searchInput" placeholder="Mã vé / SĐT khách..." class="filter-search">
                         <button class="filter-btn" onclick="filterTickets()">
@@ -138,14 +129,14 @@
                                             <span class="badge-info">Tiền mặt</span>
                                         @endif
                                     </td>
-                                    <td class="font-semibold">{{ $ticket->tong_so_tien_formatted }}</td>
+                                    <td class="font-semibold">{{ number_format((int) $ticket->tongsotien, 0, ',', '.') }}đ</td>
                                     <td>
-                                        @if($ticket->trangthai == 'da_thanh_toan')
-                                            <span class="badge-success"><i class="fas fa-check-circle"></i> Đã thanh toán</span>
-                                        @elseif($ticket->trangthai == 'cho_thanh_toan')
-                                            <span class="badge-warning"><i class="fas fa-clock"></i> Chờ thanh toán</span>
+                                        @if($ticket->trangthai == 'da_di')
+                                            <span class="badge-success"><i class="fas fa-check-circle"></i> Đã đi</span>
+                                        @elseif($ticket->trangthai == 'cho_don')
+                                            <span class="badge-warning"><i class="fas fa-clock"></i> Chờ đón</span>
                                         @else
-                                            <span class="badge-danger"><i class="fas fa-times-circle"></i> Đã hủy</span>
+                                            <span class="badge-info"><i class="fas fa-info-circle"></i> {{ $ticket->trangthai }}</span>
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -207,9 +198,8 @@
                 <div class="form-group">
                     <label class="form-label">Trạng thái <span class="required">*</span></label>
                     <select id="trangthai" name="trangthai" class="form-select" required>
-                        <option value="cho_thanh_toan">Chờ thanh toán</option>
-                        <option value="da_thanh_toan">Đã thanh toán</option>
-                        <option value="da_huy">Đã hủy</option>
+                        <option value="cho_don">Chờ đón</option>
+                        <option value="da_di">Đã đi</option>
                     </select>
                 </div>
                 <div class="modal-footer">

@@ -133,8 +133,8 @@ class PaymentController extends Controller
      */
     private function createTicket(Ghe $ghe, int $accountId, string $ngayDat, int $total, string $paymentMethod): void
     {
-        // Xác định trạng thái dựa vào phương thức thanh toán
-        $trangThai = $paymentMethod === 'chuyen_khoan' ? 'da_thanh_toan' : 'cho_thanh_toan';
+        // Vé mới được tạo theo trạng thái hành trình để đồng bộ với trang quản lý vé.
+        $trangThai = 'cho_don';
 
         Ve::create([
             'maghe' => $ghe->maghe,

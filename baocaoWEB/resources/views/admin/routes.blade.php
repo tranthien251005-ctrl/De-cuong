@@ -53,6 +53,7 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Tên tuyến</th>
                                 <th>Điểm đi</th>
                                 <th>Điểm đến</th>
                                 <th>Khoảng cách</th>
@@ -65,8 +66,9 @@
                         </thead>
                         <tbody>
                             @forelse($routes as $route)
-                                <tr class="route-row" data-search="{{ strtolower($route->diemdi . ' ' . $route->diemden) }}">
+                                <tr class="route-row" data-search="{{ strtolower($route->tentuyen . ' ' . $route->diemdi . ' ' . $route->diemden) }}">
                                     <td>{{ $route->matuyen }}</td>
+                                    <td class="font-medium">{{ $route->tentuyen }}</td>
                                     <td class="font-medium">{{ $route->diemdi }}</td>
                                     <td>{{ $route->diemden }}</td>
                                     <td>{{ number_format($route->khoangcach) }} km</td>
@@ -99,7 +101,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center p-4 text-gray-500">
+                                    <td colspan="10" class="text-center p-4 text-gray-500">
                                         <i class="fas fa-database"></i> Chưa có dữ liệu tuyến xe
                                     </td>
                                 </tr>
@@ -121,6 +123,11 @@
             <form id="routeForm" method="POST" action="{{ route('admin.routes.store') }}">
                 @csrf
                 <input type="hidden" id="routeId" name="routeId">
+
+                <div class="form-group">
+                    <label class="form-label">Tên tuyến <span class="required">*</span></label>
+                    <input type="text" id="tentuyen" name="tentuyen" class="form-input" placeholder="VD: Nam Định - Hà Nội" value="{{ old('tentuyen') }}" required>
+                </div>
 
                 <div class="form-group">
                     <label class="form-label">Chọn xe</label>

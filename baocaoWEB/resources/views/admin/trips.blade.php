@@ -73,23 +73,32 @@
                         </thead>
                         <tbody>
                             @forelse($trips as $trip)
-                                <tr class="trip-row" data-route="{{ $trip->matuyen }}" data-ngay="{{ $trip->ngaydi }}" data-search="{{ strtolower($trip->ten_tuyen . ' ' . ($trip->xe->biensoxe ?? '')) }}">
+                                @php
+                                    $displayBus = $trip->tuyenXe && $trip->tuyenXe->xe ? $trip->tuyenXe->xe : $trip->xe;
+                                    $displayPrice = $trip->tuyenXe && $trip->tuyenXe->giatien
+                                        ? ((float) $trip->tuyenXe->giatien < 1000 ? (float) $trip->tuyenXe->giatien * 1000 : (float) $trip->tuyenXe->giatien)
+                                        : $trip->giave;
+                                @endphp
+                                <tr class="trip-row" data-route="{{ $trip->matuyen }}" data-ngay="{{ $trip->ngaydi }}" data-search="{{ strtolower($trip->ten_tuyen . ' ' . ($displayBus->biensoxe ?? '')) }}">
                                     <td>{{ $trip->machuyen }}</td>
                                     <td class="font-medium">{{ $trip->ten_tuyen }}</td>
                                     <td>{{ $trip->ngay_di_formatted }}</td>
                                     <td>{{ $trip->giodi }}</td>
-                                    <td>{{ $trip->bien_so_xe }}</td>
+                                    <td>{{ $displayBus->biensoxe ?? 'Chưa cập nhật' }}</td>
                                     <td>
                                         @php
-                                            $tongGhe = $trip->xe ? $trip->xe->soghe : 0;
-                                            $gheTrong = $trip->ghe_trong;
+                                            $tongGhe = $displayBus ? $displayBus->soghe : 0;
+                                            $gheTrong = $displayBus
+                                                ? $displayBus->ghes->filter(fn($ghe) => $ghe->trangthai !== 'da_dat')->count()
+                                                : 0;
+                                            $gheTrong = min((int) $gheTrong, (int) $tongGhe);
                                             $percent = $tongGhe > 0 ? ($gheTrong / $tongGhe) * 100 : 0;
                                         @endphp
                                         <span class="{{ $gheTrong > 10 ? 'text-green-600' : 'text-red-600' }} font-semibold">
                                             {{ $gheTrong }}/{{ $tongGhe }}
                                         </span>
                                     </td>
-                                    <td class="font-semibold">{{ number_format($trip->giave, 0, ',', '.') }}đ</td>
+                                    <td class="font-semibold">{{ number_format($displayPrice, 0, ',', '.') }}đ</td>
                                     <td class="text-center">
                                         <div class="action-group">
                                             <button onclick="editTrip({{ $trip->machuyen }})" class="action-edit">
@@ -133,19 +142,29 @@
                     <select id="matuyen" name="matuyen" class="form-select" required>
                         <option value="">-- Chọn tuyến --</option>
                         @foreach($routes as $route)
-                            <option value="{{ $route->matuyen }}" {{ old('matuyen') == $route->matuyen ? 'selected' : '' }}>
-                                {{ $route->tentuyen }}
+                            <option
+                                value="{{ $route->matuyen }}"
+                                data-maxe="{{ $route->maxe }}"
+                                data-giave="{{ $route->giatien > 0 && $route->giatien < 1000 ? $route->giatien * 1000 : $route->giatien }}"
+                                {{ old('matuyen') == $route->matuyen ? 'selected' : '' }}
+                            >
+                                {{ $route->tentuyen }} - {{ $route->diemdi }} đi {{ $route->diemden }}
                             </option>
                         @endforeach
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Chọn xe <span class="required">*</span></label>
+                    <label class="form-label">Xe theo tuyến <span class="required">*</span></label>
                     <select id="maxe" name="maxe" class="form-select" required>
-                        <option value="">-- Chọn xe --</option>
+                        <option value="">-- Tự lấy theo tuyến --</option>
                         @foreach($buses as $bus)
-                            <option value="{{ $bus->maxe }}" {{ old('maxe') == $bus->maxe ? 'selected' : '' }}>
+                            <option
+                                value="{{ $bus->maxe }}"
+                                data-soghe="{{ $bus->soghe }}"
+                                data-ghe-trong="{{ min($bus->ghes->filter(fn($ghe) => $ghe->trangthai !== 'da_dat')->count(), $bus->soghe) }}"
+                                {{ old('maxe') == $bus->maxe ? 'selected' : '' }}
+                            >
                                 {{ $bus->biensoxe }} - {{ $bus->loaixe }} ({{ $bus->soghe }} ghế)
                             </option>
                         @endforeach
@@ -163,13 +182,13 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Giá vé (VNĐ) <span class="required">*</span></label>
-                    <input type="number" id="giave" name="giave" class="form-input" placeholder="VD: 150000" value="{{ old('giave') }}" required>
+                    <label class="form-label">Giá vé theo tuyến (VNĐ) <span class="required">*</span></label>
+                    <input type="number" id="giave" name="giave" class="form-input" placeholder="Tự lấy theo tuyến" value="{{ old('giave') }}" readonly required>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Số ghế trống <span class="required">*</span></label>
-                    <input type="number" id="ghe_trong" name="ghe_trong" class="form-input" placeholder="VD: 40" value="{{ old('ghe_trong') }}" required>
+                    <input type="number" id="ghe_trong" name="ghe_trong" class="form-input" placeholder="Tự cập nhật theo xe" value="{{ old('ghe_trong') }}" min="0" readonly required>
                 </div>
                 
                 <div class="modal-footer">

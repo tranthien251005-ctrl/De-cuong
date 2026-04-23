@@ -35,7 +35,7 @@ body {
     align-items: center;
     justify-content: center;
     width: 100%;
-    margin-top: 30px; /* Khoảng cách cho header */
+    margin-top: 100px; /* Khoảng cách cho header */
     margin-bottom: 30px; /* Giảm khoảng cách với footer */
     padding: 20px;
 }
@@ -295,7 +295,7 @@ body {
 /* Khi zoom nhỏ lại (thu nhỏ trình duyệt) */
 @media screen and (max-width: 600px) {
     .main-wrapper {
-        margin-top: 60px;
+        margin-top: 110px;
         margin-bottom: 30px;
         padding: 15px;
     }
@@ -359,7 +359,7 @@ body {
 /* Khi zoom rất nhỏ */
 @media screen and (max-width: 400px) {
     .main-wrapper {
-        margin-top: 55px;
+        margin-top: 105px;
         margin-bottom: 25px;
         padding: 10px;
     }

@@ -9,6 +9,8 @@ use App\Models\Xe;
 use App\Models\TuyenXe;
 use App\Models\ChuyenXe;
 use App\Models\Ve;
+use App\Models\Ghe;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
@@ -23,6 +25,66 @@ class AdminController extends Controller
         $totalBuses = Xe::count();
         $totalRoutes = TuyenXe::count();
         $totalTickets = Ve::count();
+        $todayOrders = Ve::whereDate('ngaydat', Carbon::today())->count();
+        $monthlyRevenue = Ve::whereYear('ngaydat', Carbon::now()->year)
+            ->whereMonth('ngaydat', Carbon::now()->month)
+            ->sum('tongsotien');
+
+        $recentTickets = Ve::with('taiKhoan')
+            ->orderByDesc('ngaydat')
+            ->orderByDesc('mave')
+            ->limit(3)
+            ->get()
+            ->map(function ($ticket) {
+                $customerName = optional($ticket->taiKhoan)->hoten
+                    ?: optional($ticket->taiKhoan)->phone
+                    ?: 'Khách hàng';
+
+                return [
+                    'icon' => 'fas fa-ticket-alt',
+                    'icon_bg' => 'bg-blue-100',
+                    'icon_color' => 'text-blue-600',
+                    'name' => 'Vé mới: #V' . str_pad($ticket->mave, 6, '0', STR_PAD_LEFT)
+                        . ' - ' . $customerName,
+                    'time' => $ticket->ngaydat ? Carbon::parse($ticket->ngaydat)->diffForHumans() : 'Chưa cập nhật',
+                    'sort_time' => $ticket->ngaydat ? Carbon::parse($ticket->ngaydat)->timestamp : 0,
+                ];
+            });
+
+        $recentUsers = TaiKhoan::orderByDesc('id')
+            ->limit(2)
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'icon' => 'fas fa-user-plus',
+                    'icon_bg' => 'bg-green-100',
+                    'icon_color' => 'text-green-600',
+                    'name' => 'Người dùng mới: ' . ($user->hoten ?: $user->phone),
+                    'time' => 'Theo dữ liệu mới nhất',
+                    'sort_time' => 0,
+                ];
+            });
+
+        $recentRoutes = TuyenXe::orderByDesc('matuyen')
+            ->limit(2)
+            ->get()
+            ->map(function ($route) {
+                return [
+                    'icon' => 'fas fa-route',
+                    'icon_bg' => 'bg-yellow-100',
+                    'icon_color' => 'text-yellow-600',
+                    'name' => 'Tuyến xe mới: ' . ($route->tentuyen ?: trim($route->diemdi . ' - ' . $route->diemden)),
+                    'time' => 'Theo dữ liệu mới nhất',
+                    'sort_time' => 0,
+                ];
+            });
+
+        $recentActivities = $recentTickets
+            ->concat($recentUsers)
+            ->concat($recentRoutes)
+            ->sortByDesc('sort_time')
+            ->take(5)
+            ->values();
 
         return view('admin.dashboard', compact(
             'totalUsers',
@@ -31,7 +93,10 @@ class AdminController extends Controller
             'totalCustomers',
             'totalBuses',
             'totalRoutes',
-            'totalTickets'
+            'totalTickets',
+            'todayOrders',
+            'monthlyRevenue',
+            'recentActivities'
         ));
     }
 
@@ -79,11 +144,11 @@ class AdminController extends Controller
 
         try {
             TaiKhoan::create([
-                'hoten' => $request->hoten,
                 'phone' => $request->phone,
-                'email' => $request->email,
                 'password' => $request->password,
                 'role' => $request->role,
+                'email' => $request->email,
+                'hoten' => $request->hoten,
             ]);
 
             return redirect()->route('admin.users')->with('success', 'Thêm người dùng thành công!');
@@ -98,20 +163,25 @@ class AdminController extends Controller
     {
         $request->validate([
             'hoten' => 'required|string|max:255',
-            'phone' => 'required|string|unique:taikhoan,phone,' . $id,
-            'email' => 'nullable|email|unique:taikhoan,email,' . $id,
+            'phone' => 'required|string|unique:taikhoan,phone,' . $id . ',id',
+            'email' => 'nullable|email|unique:taikhoan,email,' . $id . ',id',
             'password' => 'nullable|string|min:6',
             'role' => 'required|in:admin,tai_xe,khach_hang',
         ]);
         try {
             $user = TaiKhoan::findOrFail($id);
-            $user->update([
-                'hoten' => $request->hoten,
+            $data = [
                 'phone' => $request->phone,
-                'email' => $request->email,
-                'password' => $request->password ? $request->password : $user->password,
                 'role' => $request->role,
-            ]);
+                'email' => $request->email,
+                'hoten' => $request->hoten,
+            ];
+
+            if ($request->filled('password')) {
+                $data['password'] = $request->password;
+            }
+
+            $user->update($data);
 
             return redirect()->route('admin.users')->with('success', 'Cập nhật người dùng thành công!');
         } catch (\Exception $e) {
@@ -165,7 +235,7 @@ class AdminController extends Controller
     public function storeBus(Request $request)
     {
         $request->validate([
-            'biensoxe' => 'required|string|unique:xe,biensoxe',
+            'biensoxe' => 'required|string',
             'loaixe' => 'required|string',
             'soghe' => 'required|integer|min:1',
             'nhaxe' => 'required|string',
@@ -180,13 +250,23 @@ class AdminController extends Controller
         ]);
 
         try {
-            Xe::create([
-                'biensoxe' => $request->biensoxe,
+            $bienSoXe = trim($request->biensoxe);
+
+            if ($this->busPlateExists($bienSoXe)) {
+                return back()
+                    ->withErrors(['biensoxe' => 'Biển số xe "' . $bienSoXe . '" đã tồn tại'])
+                    ->withInput();
+            }
+
+            $data = [
+                'biensoxe' => $bienSoXe,
                 'loaixe' => $request->loaixe,
                 'soghe' => $request->soghe,
                 'nhaxe' => $request->nhaxe,
                 'trangthai' => $request->trangthai,
-            ]);
+            ];
+
+            Xe::create($data);
 
             return redirect()->route('admin.buses')->with('success', 'Thêm xe thành công!');
         } catch (\Exception $e) {
@@ -199,7 +279,7 @@ class AdminController extends Controller
     public function updateBus(Request $request, $id)
     {
         $request->validate([
-            'biensoxe' => 'required|string|unique:xe,biensoxe,' . $id . ',maxe',
+            'biensoxe' => 'required|string',
             'loaixe' => 'required|string',
             'soghe' => 'required|integer|min:1',
             'nhaxe' => 'required|string',
@@ -208,13 +288,23 @@ class AdminController extends Controller
 
         try {
             $bus = Xe::findOrFail($id);
-            $bus->update([
-                'biensoxe' => $request->biensoxe,
+            $bienSoXe = trim($request->biensoxe);
+
+            if ($this->busPlateExists($bienSoXe, $id)) {
+                return back()
+                    ->withErrors(['biensoxe' => 'Biển số xe "' . $bienSoXe . '" đã tồn tại'])
+                    ->withInput();
+            }
+
+            $data = [
+                'biensoxe' => $bienSoXe,
                 'loaixe' => $request->loaixe,
                 'soghe' => $request->soghe,
                 'nhaxe' => $request->nhaxe,
                 'trangthai' => $request->trangthai,
-            ]);
+            ];
+
+            $bus->update($data);
 
             return redirect()->route('admin.buses')->with('success', 'Cập nhật xe thành công!');
         } catch (\Exception $e) {
@@ -256,6 +346,17 @@ class AdminController extends Controller
 
 
     // Quản lý tuyến - Hiển thị danh sách
+    private function busPlateExists(string $bienSoXe, ?int $exceptBusId = null): bool
+    {
+        $query = Xe::whereRaw('LOWER(TRIM(biensoxe)) = ?', [mb_strtolower(trim($bienSoXe))]);
+
+        if ($exceptBusId) {
+            $query->where('maxe', '!=', $exceptBusId);
+        }
+
+        return $query->exists();
+    }
+
     public function routes()
     {
         try {
@@ -276,6 +377,7 @@ class AdminController extends Controller
     public function storeRoute(Request $request)
     {
         $request->validate([
+            'tentuyen' => 'required|string|max:255',
             'diemdi' => 'required|string|max:255',
             'diemden' => 'required|string|max:255',
             'khoangcach' => 'required|numeric|min:0',
@@ -293,18 +395,7 @@ class AdminController extends Controller
         ]);
 
         try {
-            $tenTuyen = trim($request->diemdi . ' - ' . $request->diemden);
-
-            $route = TuyenXe::create([
-                'tentuyen' => $tenTuyen,
-                'diemdi' => $request->diemdi,
-                'diemden' => $request->diemden,
-                'khoangcach' => $request->khoangcach,
-                'thoigiandukien' => $request->thoigian,
-                'giatien' => $request->giatien,
-                'trangthai' => $request->trangthai,
-                'maxe' => $request->maxe,
-            ]);
+            TuyenXe::create($this->routeData($request));
 
             return redirect()->route('admin.routes')->with('success', 'Thêm tuyến thành công!');
         } catch (\Exception $e) {
@@ -317,6 +408,7 @@ class AdminController extends Controller
     public function updateRoute(Request $request, $id)
     {
         $request->validate([
+            'tentuyen' => 'required|string|max:255',
             'diemdi' => 'required|string|max:255',
             'diemden' => 'required|string|max:255',
             'khoangcach' => 'required|numeric|min:0',
@@ -328,18 +420,7 @@ class AdminController extends Controller
 
         try {
             $route = TuyenXe::findOrFail($id);
-            $tenTuyen = trim($request->diemdi . ' - ' . $request->diemden);
-
-            $route->update([
-                'tentuyen' => $tenTuyen,
-                'diemdi' => $request->diemdi,
-                'diemden' => $request->diemden,
-                'khoangcach' => $request->khoangcach,
-                'thoigiandukien' => $request->thoigian,
-                'giatien' => $request->giatien,
-                'trangthai' => $request->trangthai,
-                'maxe' => $request->maxe,
-            ]);
+            $route->update($this->routeData($request));
 
             return redirect()->route('admin.routes')->with('success', 'Cập nhật tuyến thành công!');
         } catch (\Exception $e) {
@@ -382,14 +463,28 @@ class AdminController extends Controller
     // ========== QUẢN LÝ CHUYẾN XE ==========
 
 
+    private function routeData(Request $request): array
+    {
+        return [
+            'tentuyen' => trim($request->tentuyen),
+            'diemdi' => trim($request->diemdi),
+            'diemden' => trim($request->diemden),
+            'thoigiandukien' => trim($request->thoigian),
+            'khoangcach' => $request->khoangcach,
+            'giatien' => $request->giatien,
+            'maxe' => $request->maxe ?: null,
+            'trangthai' => $request->trangthai,
+        ];
+    }
+
     public function trips()
     {
         try {
-            $trips = ChuyenXe::with(['tuyenXe', 'xe'])
+            $trips = ChuyenXe::with(['tuyenXe.xe.ghes', 'xe.ghes'])
                 ->orderBy('machuyen', 'asc')
                 ->get();
-            $routes = TuyenXe::where('trangthai', 'Đang hoạt động')->get();
-            $buses = Xe::where('trangthai', 'Đang hoạt động')->get();
+            $routes = TuyenXe::with('xe')->where('trangthai', 'Đang hoạt động')->get();
+            $buses = Xe::with('ghes')->where('trangthai', 'Đang hoạt động')->get();
             return view('admin.trips', compact('trips', 'routes', 'buses'));
         } catch (\Exception $e) {
             Log::error('Admin trips error: ' . $e->getMessage());
@@ -405,15 +500,14 @@ class AdminController extends Controller
     {
         $request->validate([
             'matuyen' => 'required|exists:tuyenxe,matuyen',
-            'maxe' => 'required|exists:xe,maxe',
+            'maxe' => 'nullable|exists:xe,maxe',
             'ngaydi' => 'required|date',
             'giodi' => 'required',
-            'giave' => 'required|numeric|min:0',
-            'ghe_trong' => 'required|numeric|min:0',
+            'giave' => 'nullable|numeric|min:0',
         ]);
 
         try {
-            ChuyenXe::create($request->all());
+            ChuyenXe::create($this->tripData($request));
             return redirect()->route('admin.trips')->with('success', 'Thêm chuyến thành công!');
         } catch (\Exception $e) {
             Log::error('Store trip error: ' . $e->getMessage());
@@ -426,16 +520,15 @@ class AdminController extends Controller
     {
         $request->validate([
             'matuyen' => 'required|exists:tuyenxe,matuyen',
-            'maxe' => 'required|exists:xe,maxe',
+            'maxe' => 'nullable|exists:xe,maxe',
             'ngaydi' => 'required|date',
             'giodi' => 'required',
-            'giave' => 'required|numeric|min:0',
-            'ghe_trong' => 'required|numeric|min:0',
+            'giave' => 'nullable|numeric|min:0',
         ]);
 
         try {
             $trip = ChuyenXe::findOrFail($id);
-            $trip->update($request->all());
+            $trip->update($this->tripData($request));
             return redirect()->route('admin.trips')->with('success', 'Cập nhật chuyến thành công!');
         } catch (\Exception $e) {
             Log::error('Update trip error: ' . $e->getMessage());
@@ -460,7 +553,8 @@ class AdminController extends Controller
     public function getTrip($id)
     {
         try {
-            $trip = ChuyenXe::with(['tuyenXe', 'xe'])->findOrFail($id);
+            $trip = ChuyenXe::with(['tuyenXe', 'xe.ghes'])->findOrFail($id);
+            $trip->ghe_trong = $this->availableSeatsForBus((int) $trip->maxe);
             return response()->json($trip);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Không tìm thấy chuyến'], 404);
@@ -472,6 +566,49 @@ class AdminController extends Controller
 
 
     // Hiển thị danh sách vé
+    private function tripData(Request $request): array
+    {
+        $route = TuyenXe::findOrFail($request->matuyen);
+        $busId = $route->maxe ?: $request->maxe;
+
+        if (!$busId) {
+            throw new \RuntimeException('Tuyến xe chưa được phân công xe.');
+        }
+
+        return [
+            'matuyen' => $route->matuyen,
+            'maxe' => $busId,
+            'ngaydi' => $request->ngaydi,
+            'giodi' => $request->giodi,
+            'giave' => $this->normalizeTicketPrice($route->giatien ?: $request->giave),
+            'ghe_trong' => $this->availableSeatsForBus((int) $busId),
+        ];
+    }
+
+    private function normalizeTicketPrice($price): int
+    {
+        $price = (float) $price;
+
+        if ($price > 0 && $price < 1000) {
+            return (int) ($price * 1000);
+        }
+
+        return (int) $price;
+    }
+
+    private function availableSeatsForBus(int $busId): int
+    {
+        $totalSeats = (int) Xe::where('maxe', $busId)->value('soghe');
+        $availableSeats = Ghe::where('maxe', $busId)
+            ->where(function ($query) {
+                $query->where('trangthai', '!=', 'da_dat')
+                    ->orWhereNull('trangthai');
+            })
+            ->count();
+
+        return min($availableSeats, $totalSeats);
+    }
+
     public function tickets()
     {
         try {
@@ -482,8 +619,8 @@ class AdminController extends Controller
             // Thống kê
             $totalTickets = $tickets->count();
             $totalRevenue = $tickets->sum('tongsotien');
-            $daThanhToan = $tickets->where('trangthai', 'da_thanh_toan')->count();
-            $choThanhToan = $tickets->where('trangthai', 'cho_thanh_toan')->count();
+            $daThanhToan = $tickets->where('trangthai', 'da_di')->count();
+            $choThanhToan = $tickets->where('trangthai', 'cho_don')->count();
 
             return view('admin.tickets', compact('tickets', 'totalTickets', 'totalRevenue', 'daThanhToan', 'choThanhToan'));
         } catch (\Exception $e) {
@@ -501,7 +638,7 @@ class AdminController extends Controller
     public function updateTicketStatus(Request $request, $id)
     {
         $request->validate([
-            'trangthai' => 'required|in:cho_thanh_toan,da_thanh_toan,da_huy',
+            'trangthai' => 'required|in:cho_don,da_di',
         ]);
 
         try {

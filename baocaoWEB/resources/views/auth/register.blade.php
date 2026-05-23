@@ -7,7 +7,7 @@
     <title>Đăng Ký - {{ config('app.name', 'Laravel') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <link rel="stylesheet" href="{{ asset('css/register.css') }}">
+    <link rel="stylesheet" href="/css/register.css">
 </head>
 <body>
     @include('pages.header')
@@ -104,7 +104,6 @@
 
     @include('pages.footer')
 
-    <script src="{{ asset('js/register.js') }}"></script>
+    <script src="/js/register.js"></script>
 </body>
 </html>
-

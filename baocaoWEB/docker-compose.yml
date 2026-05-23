@@ -1,0 +1,54 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: baocaoweb-app
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - vendor_data:/var/www/html/vendor
+    command: ["sh", "/var/www/html/docker/scripts/start-app.sh"]
+    depends_on:
+      - db
+
+  web:
+    image: nginx:1.27-alpine
+    container_name: baocaoweb-web
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+
+  vite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: baocaoweb-vite
+    working_dir: /var/www/html
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/var/www/html
+      - node_modules_data:/var/www/html/node_modules
+    command: ["sh", "/var/www/html/docker/scripts/start-vite.sh"]
+
+  db:
+    image: postgres:16-alpine
+    container_name: baocaoweb-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: baocaoweb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  vendor_data:
+  node_modules_data:

@@ -1,0 +1,33 @@
+FROM composer:2 AS vendor
+
+WORKDIR /app
+
+COPY baocaoWEB/composer.json baocaoWEB/composer.lock ./
+RUN composer install \
+    --no-dev \
+    --prefer-dist \
+    --no-interaction \
+    --optimize-autoloader
+
+FROM php:8.2-cli
+
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libpq-dev \
+    libzip-dev \
+    && docker-php-ext-install pdo_pgsql zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /var/www/html
+
+COPY baocaoWEB/ ./
+COPY --from=vendor /app/vendor ./vendor
+
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
+
+EXPOSE 10000
+
+CMD ["sh", "/var/www/html/docker/scripts/start-render.sh"]

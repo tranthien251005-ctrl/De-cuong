@@ -19,4 +19,4 @@ php artisan config:clear
 php artisan route:clear
 php artisan view:clear
 
-exec php artisan serve --host=0.0.0.0 --port="$PORT"
+exec php -S 0.0.0.0:"$PORT" -t public

@@ -181,6 +181,6 @@
         </div>
     </div>
     
-    <script src="{{ asset('js/admin.js') }}"></script>
+    <script src="{{ asset('js/admin.js') }}?v=2"></script>
 </body>
 </html>

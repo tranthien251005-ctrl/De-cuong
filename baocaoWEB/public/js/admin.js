@@ -1,8 +1,7 @@
-﻿// ==========================================
-// 1. HĂ m há»— trá»£ dĂ¹ng chung
+// ==========================================
+// 1. Hàm hỗ trợ dùng chung
 // ==========================================
 
-// Má»Ÿ modal dĂ¹ng chung, náº¿u cĂ³ tiĂªu Ä‘á» thĂ¬ cáº­p nháº­t luĂ´n.
 function openModal(modalId, title) {
     const modal = document.getElementById(modalId);
     const modalTitle = document.getElementById("modalTitle");
@@ -11,19 +10,17 @@ function openModal(modalId, title) {
     if (modal) modal.classList.add("show");
 }
 
-// ÄĂ³ng modal dĂ¹ng chung theo id.
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.classList.remove("show");
 }
 
-// Kiá»ƒm tra trang hiá»‡n táº¡i cĂ³ pháº£i lĂ  trang quáº£n lĂ½ vĂ© hay khĂ´ng.
 function isTicketsPage() {
     return document.body?.dataset?.page === "admin-tickets";
 }
 
 // ==========================================
-// 2. Quáº£n lĂ½ ngÆ°á»i dĂ¹ng
+// 2. Quản lý người dùng
 // ==========================================
 
 let deleteUserId = null;
@@ -38,13 +35,13 @@ function openCreateUserModal() {
     const password = document.getElementById("password");
     const passwordGroup = document.getElementById("passwordGroup");
 
-    if (modalTitle) modalTitle.innerText = "ThĂªm ngÆ°á»i dĂ¹ng má»›i";
+    if (modalTitle) modalTitle.innerText = "Thêm người dùng mới";
     if (userForm) userForm.reset();
     if (userId) userId.value = "";
     if (password) {
         password.required = true;
         password.value = "";
-        password.placeholder = "Nháº­p máº­t kháº©u (tá»‘i thiá»ƒu 6 kĂ½ tá»±)";
+        password.placeholder = "Nhập mật khẩu (tối thiểu 6 ký tự)";
     }
     if (passwordGroup) passwordGroup.style.display = "";
     if (userForm) userForm.action = "/admin/users/store";
@@ -61,12 +58,12 @@ function editUser(id) {
     const password = document.getElementById("password");
     const passwordGroup = document.getElementById("passwordGroup");
 
-    if (modalTitle) modalTitle.innerText = "Sá»­a thĂ´ng tin ngÆ°á»i dĂ¹ng";
+    if (modalTitle) modalTitle.innerText = "Sửa thông tin người dùng";
     if (userId) userId.value = id;
     if (password) {
         password.required = false;
         password.value = "";
-        password.placeholder = "Bá» trá»‘ng náº¿u khĂ´ng Ä‘á»•i máº­t kháº©u";
+        password.placeholder = "Bỏ trống nếu không đổi mật khẩu";
     }
     if (passwordGroup) passwordGroup.style.display = "none";
     if (userForm) userForm.action = `/admin/users/update/${id}`;
@@ -85,7 +82,7 @@ function editUser(id) {
             if (role) role.value = data.role;
         })
         .catch((error) =>
-            console.error("Lá»—i táº£i dá»¯ liá»‡u ngÆ°á»i dĂ¹ng:", error),
+            console.error("Lỗi tải dữ liệu người dùng:", error),
         );
 
     document.getElementById("userModal")?.classList.add("show");
@@ -150,7 +147,7 @@ function confirmDeleteUser() {
 }
 
 // ==========================================
-// 3. Quáº£n lĂ½ xe
+// 3. Quản lý xe
 // ==========================================
 
 let deleteBusId = null;
@@ -163,7 +160,7 @@ function openCreateBusModal() {
     const busForm = document.getElementById("busForm");
     const busId = document.getElementById("busId");
 
-    if (modalTitle) modalTitle.innerText = "ThĂªm xe má»›i";
+    if (modalTitle) modalTitle.innerText = "Thêm xe mới";
     if (busForm) busForm.reset();
     if (busId) busId.value = "";
     if (busForm) busForm.action = "/admin/buses/store";
@@ -178,7 +175,7 @@ function editBus(id) {
     const busForm = document.getElementById("busForm");
     const busId = document.getElementById("busId");
 
-    if (modalTitle) modalTitle.innerText = "Sá»­a thĂ´ng tin xe";
+    if (modalTitle) modalTitle.innerText = "Sửa thông tin xe";
     if (busId) busId.value = id;
     if (busForm) busForm.action = `/admin/buses/update/${id}`;
 
@@ -197,7 +194,7 @@ function editBus(id) {
             if (nhaxe) nhaxe.value = data.nhaxe;
             if (trangthai) trangthai.value = data.trangthai;
         })
-        .catch((error) => console.error("Lá»—i táº£i dá»¯ liá»‡u xe:", error));
+        .catch((error) => console.error("Lỗi tải dữ liệu xe:", error));
 
     document.getElementById("busModal")?.classList.add("show");
 }
@@ -260,13 +257,13 @@ function resetBusFilter() {
 }
 
 // ==========================================
-// 4. Quáº£n lĂ½ tuyáº¿n
+// 4. Quản lý tuyến
 // ==========================================
 
 let deleteRouteId = null;
 
 function openCreateRouteModal() {
-    document.getElementById("routeModalTitle").innerText = "ThĂªm tuyáº¿n má»›i";
+    document.getElementById("routeModalTitle").innerText = "Thêm tuyến mới";
     document.getElementById("routeForm").reset();
     document.getElementById("routeId").value = "";
     document.getElementById("routeForm").action = "/admin/routes/store";
@@ -275,7 +272,7 @@ function openCreateRouteModal() {
 
 function editRoute(id) {
     document.getElementById("routeModalTitle").innerText =
-        "Sá»­a thĂ´ng tin tuyáº¿n";
+        "Sửa thông tin tuyến";
     document.getElementById("routeId").value = id;
     document.getElementById("routeForm").action = `/admin/routes/update/${id}`;
 
@@ -290,10 +287,10 @@ function editRoute(id) {
                 data.thoigiandukien || data.thoigian || "";
             document.getElementById("giatien").value = data.giatien || "";
             document.getElementById("trangthai").value =
-                data.trangthai || "Äang hoáº¡t Ä‘á»™ng";
+                data.trangthai || "Đang hoạt động";
             document.getElementById("maxe").value = data.maxe || "";
         })
-        .catch((error) => console.error("Lá»—i táº£i dá»¯ liá»‡u tuyáº¿n:", error));
+        .catch((error) => console.error("Lỗi tải dữ liệu tuyến:", error));
 
     document.getElementById("routeModal").classList.add("show");
 }
@@ -346,7 +343,7 @@ function resetRouteFilter() {
 }
 
 document.getElementById("routeForm")?.addEventListener("submit", function () {
-    console.log("Äang gá»­i form tuyáº¿n...");
+    console.log("Đang gửi form tuyến...");
 });
 
 document
@@ -354,13 +351,13 @@ document
     ?.addEventListener("click", confirmDeleteRoute);
 
 // ==========================================
-// 5. Quáº£n lĂ½ chuyáº¿n
+// 5. Quản lý chuyến
 // ==========================================
 
 let deleteTripId = null;
 
 function openCreateTripModal() {
-    document.getElementById("tripModalTitle").innerText = "ThĂªm chuyáº¿n má»›i";
+    document.getElementById("tripModalTitle").innerText = "Thêm chuyến mới";
     document.getElementById("tripForm").reset();
     document.getElementById("tripId").value = "";
     document.getElementById("tripForm").action = "/admin/trips/store";
@@ -370,7 +367,7 @@ function openCreateTripModal() {
 
 function editTrip(id) {
     document.getElementById("tripModalTitle").innerText =
-        "Sá»­a thĂ´ng tin chuyáº¿n";
+        "Sửa thông tin chuyến";
     document.getElementById("tripId").value = id;
     document.getElementById("tripForm").action = `/admin/trips/update/${id}`;
 
@@ -385,13 +382,13 @@ function editTrip(id) {
             document.getElementById("giave").value = data.giave || "";
             syncTripSeatsWithBus(data.ghe_trong || "");
         })
-        .catch((error) => console.error("Lá»—i táº£i dá»¯ liá»‡u chuyáº¿n:", error));
+        .catch((error) => console.error("Lỗi tải dữ liệu chuyến:", error));
 
-    document.getElementById("tripModal").classList.add("show");
+    document.getElementById("tripModal")?.classList.add("show");
 }
 
 function closeTripModal() {
-    document.getElementById("tripModal").classList.remove("show");
+    document.getElementById("tripModal")?.classList.remove("show");
 }
 
 function syncTripWithRoute() {
@@ -492,11 +489,11 @@ document
     ?.addEventListener("click", confirmDeleteTrip);
 
 document.getElementById("tripForm")?.addEventListener("submit", function () {
-    console.log("Äang gá»­i form chuyáº¿n...");
+    console.log("Đang gửi form chuyến...");
 });
 
 // ==========================================
-// 6. Quáº£n lĂ½ vĂ©
+// 6. Quản lý vé
 // ==========================================
 
 let deleteTicketId = null;
@@ -523,35 +520,35 @@ function viewTicket(id) {
         .then((data) => {
             const detailHtml = `
                 <div class="form-group">
-                    <label class="form-label">MĂ£ vĂ©:</label>
+                    <label class="form-label">Mã vé:</label>
                     <p class="form-label" style="font-weight: normal;">#V${String(data.mave).padStart(6, "0")}</p>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">KhĂ¡ch hĂ ng:</label>
+                    <label class="form-label">Khách hàng:</label>
                     <p class="form-label" style="font-weight: normal;">${data.tai_khoan?.hoten || "N/A"}</p>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Sá»‘ Ä‘iá»‡n thoáº¡i:</label>
+                    <label class="form-label">Số điện thoại:</label>
                     <p class="form-label" style="font-weight: normal;">${data.tai_khoan?.phone || "N/A"}</p>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Sá»‘ gháº¿:</label>
+                    <label class="form-label">Số ghế:</label>
                     <p class="form-label" style="font-weight: normal;">${data.ghe?.tenghe || "N/A"}</p>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">NgĂ y Ä‘áº·t:</label>
+                    <label class="form-label">Ngày đặt:</label>
                     <p class="form-label" style="font-weight: normal;">${new Date(data.ngaydat).toLocaleDateString("vi-VN")}</p>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">HĂ¬nh thá»©c:</label>
-                    <p class="form-label" style="font-weight: normal;">${data.hinhthucthanhtoan === "chuyen_khoan" ? "Chuyá»ƒn khoáº£n" : "Tiá»n máº·t"}</p>
+                    <label class="form-label">Hình thức:</label>
+                    <p class="form-label" style="font-weight: normal;">${data.hinhthucthanhtoan === "chuyen_khoan" ? "Chuyển khoản" : "Tiền mặt"}</p>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">GiĂ¡ vĂ©:</label>
+                    <label class="form-label">Giá vé:</label>
                     <p class="form-label" style="font-weight: bold; color: #16a34a;">${new Intl.NumberFormat("vi-VN").format(data.tongsotien)}đ</p>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Tráº¡ng thĂ¡i:</label>
+                    <label class="form-label">Trạng thái:</label>
                     <p class="form-label">${getTicketStatusBadge(data.trangthai)}</p>
                 </div>
             `;
@@ -559,7 +556,7 @@ function viewTicket(id) {
             const ticketDetail = document.getElementById("ticketDetail");
             if (ticketDetail) ticketDetail.innerHTML = detailHtml;
         })
-        .catch((error) => console.error("Lá»—i táº£i chi tiáº¿t vĂ©:", error));
+        .catch((error) => console.error("Lỗi tải chi tiết vé:", error));
 
     document.getElementById("ticketModal")?.classList.add("show");
 }
@@ -604,11 +601,11 @@ function confirmDeleteTicket() {
 
 function printTicket(ticketCode) {
     if (isTicketsPage()) {
-        alert("Äang in vĂ© #V" + String(ticketCode).padStart(6, "0"));
+        alert("Đang in vé #V" + String(ticketCode).padStart(6, "0"));
         return;
     }
 
-    alert("Äang in vĂ© " + ticketCode);
+    alert("Đang in vé " + ticketCode);
 }
 
 function printCurrentTicket() {
@@ -665,7 +662,7 @@ function initTicketsPage() {
 }
 
 // ==========================================
-// 7. Hiá»ƒn thá»‹ / áº©n máº­t kháº©u
+// 7. Hiển thị / ẩn mật khẩu
 // ==========================================
 
 function togglePassword(fieldId) {
@@ -689,37 +686,37 @@ function togglePassword(fieldId) {
 }
 
 // ==========================================
-// 8. BĂ¡o cĂ¡o / thao tĂ¡c giáº£ láº­p
+// 8. Báo cáo / thao tác giả lập
 // ==========================================
 
 function exportReport(type) {
-    alert("Xuáº¥t bĂ¡o cĂ¡o " + type);
+    alert("Xuất báo cáo " + type);
 }
 
 function viewTicketDetail(ticketCode) {
-    alert("Chi tiáº¿t vĂ©: " + ticketCode);
+    alert("Chi tiết vé: " + ticketCode);
 }
 
 function viewPaymentDetail(paymentId) {
-    alert("Chi tiáº¿t giao dá»‹ch: " + paymentId);
+    alert("Chi tiết giao dịch: " + paymentId);
 }
 
 // ==========================================
-// 9. CĂ i Ä‘áº·t há»‡ thá»‘ng
+// 9. Cài đặt hệ thống
 // ==========================================
 
 function saveSettings() {
-    alert("Da luu cai dat he thong!");
+    alert("Đã lưu cài đặt hệ thống!");
 }
 
 function resetSettings() {
-    if (confirm("KhĂ´i phá»¥c cĂ i Ä‘áº·t máº·c Ä‘á»‹nh?")) {
-        alert("ÄĂ£ khĂ´i phá»¥c cĂ i Ä‘áº·t máº·c Ä‘á»‹nh");
+    if (confirm("Khôi phục cài đặt mặc định?")) {
+        alert("Đã khôi phục cài đặt mặc định");
     }
 }
 
 function refreshReport() {
-    alert("Äang táº£i bĂ¡o cĂ¡o má»›i...");
+    alert("Đang tải báo cáo mới...");
 }
 
 // ==========================================
@@ -727,17 +724,17 @@ function refreshReport() {
 // ==========================================
 
 function editItem(id, module) {
-    alert("Chá»©c nÄƒng sá»­a Ä‘ang phĂ¡t triá»ƒn. ID: " + id + " - Module: " + module);
+    alert("Chức năng sửa đang phát triển. ID: " + id + " - Module: " + module);
 }
 
 function deleteItem(id, module, deleteUrl) {
-    if (confirm("Báº¡n cĂ³ cháº¯c cháº¯n muá»‘n xĂ³a " + module + " nĂ y?")) {
+    if (confirm("Bạn có chắc chắn muốn xóa " + module + " này?")) {
         window.location.href = deleteUrl + "/" + id;
     }
 }
 
 // ==========================================
-// 11. Khá»Ÿi táº¡o khi táº£i trang
+// 11. Khởi tạo khi tải trang
 // ==========================================
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -825,5 +822,3 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-
-

@@ -12,6 +12,13 @@ class BookingController extends Controller
     {
         $tuyen = TuyenXe::findOrFail($matuyen);
 
+        $routeStatus = mb_strtolower(trim((string) ($tuyen->trangthai ?? '')), 'UTF-8');
+        if ($routeStatus === 'ngừng hoạt động' || $routeStatus === 'ngung hoat dong') {
+            return redirect()
+                ->route('home')
+                ->with('error', 'Tuyến xe này hiện đang ngừng hoạt động nên chưa thể đặt chỗ.');
+        }
+
         $ghes = Ghe::where('maxe', $tuyen->maxe)->get();
         $ghes = $ghes->sortBy(function ($ghe) {
             preg_match('/(\d+)/', (string) $ghe->tenghe, $matches);
@@ -31,4 +38,3 @@ class BookingController extends Controller
         return $this->index($matuyen);
     }
 }
-

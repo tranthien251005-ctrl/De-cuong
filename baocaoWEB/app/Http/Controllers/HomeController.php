@@ -3,33 +3,42 @@
 namespace App\Http\Controllers;
 
 use App\Models\TuyenXe;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        $filterOptions = TuyenXe::query()
-            ->orderBy('diemdi')
-            ->orderBy('diemden')
-            ->get();
+        $filterOptions = collect();
+        $tuyenXes = collect();
+        $dbError = null;
 
-        $query = TuyenXe::query();
+        try {
+            $filterOptions = TuyenXe::query()
+                ->orderBy('diemdi')
+                ->orderBy('diemden')
+                ->get();
 
-        if ($request->filled('from')) {
-            $query->where('diemdi', $request->from);
+            $query = TuyenXe::query();
+
+            if ($request->filled('from')) {
+                $query->where('diemdi', $request->from);
+            }
+
+            if ($request->filled('to')) {
+                $query->where('diemden', $request->to);
+            }
+
+            if ($request->filled('duration')) {
+                $query->where('thoigiandukien', $request->duration);
+            }
+
+            $tuyenXes = $query->get();
+        } catch (QueryException $exception) {
+            $dbError = 'Hiện chưa thể kết nối cơ sở dữ liệu để tải danh sách tuyến xe. Vui lòng kiểm tra lại cấu hình mạng hoặc kết nối Supabase.';
         }
 
-        if ($request->filled('to')) {
-            $query->where('diemden', $request->to);
-        }
-
-        if ($request->filled('duration')) {
-            $query->where('thoigiandukien', $request->duration);
-        }
-
-        $tuyenXes = $query->get();
-
-        return view('layouts.home', compact('tuyenXes', 'filterOptions'));
+        return view('layouts.home', compact('tuyenXes', 'filterOptions', 'dbError'));
     }
 }

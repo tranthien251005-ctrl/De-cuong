@@ -25,11 +25,31 @@
     </div>
 @endif
 
+@if(session('error'))
+    <div class="booking-success booking-success--error" id="bookingError">
+        <div class="booking-success__icon"><i class="fas fa-ban"></i></div>
+        <div>
+            <strong>Chưa thể đặt vé</strong>
+            <p>{{ session('error') }}</p>
+        </div>
+        <button type="button" aria-label="Đóng thông báo" onclick="document.getElementById('bookingError').remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+@endif
+
 <div class="main-wrapper">
     <div class="hero">
         <div class="hero-content">
             <h1><i class="fas fa-bus-alt"></i> HÀNH TRÌNH TIẾP THEO CỦA BẠN</h1>
             <p>Đặt vé trực tuyến nhanh chóng, an toàn và tiện lợi nhất cùng MY BUS.</p>
+
+            @if(!empty($dbError))
+                <div style="margin: 18px 0; padding: 14px 16px; border-radius: 14px; background: rgba(180, 34, 24, 0.12); color: #7a1d16; border: 1px solid rgba(180, 34, 24, 0.18);">
+                    <strong>Khong tai duoc du lieu tuyen xe.</strong>
+                    <div style="margin-top: 6px;">{{ $dbError }}</div>
+                </div>
+            @endif
 
             <form method="GET" action="{{ url('/') }}" class="search-banner">
                 <select name="from">
@@ -79,9 +99,19 @@
 
         <div class="routes-grid">
             @forelse($tuyenXes as $tuyen)
-                <div class="route-card">
+                @php
+                    $routeStatus = mb_strtolower(trim((string) ($tuyen->trangthai ?? '')), 'UTF-8');
+                    $isInactive = in_array($routeStatus, ['ngừng hoạt động', 'ngung hoat dong'], true);
+                @endphp
+                <div class="route-card {{ $isInactive ? 'route-card--inactive' : '' }}">
                     <div class="route-header">
-                        <i class="fas fa-route"></i> {{ $tuyen->tentuyen }}
+                        <div class="route-header__title">
+                            <i class="fas fa-route"></i>
+                            <span>{{ $tuyen->tentuyen }}</span>
+                        </div>
+                        <span class="route-status {{ $isInactive ? 'route-status--inactive' : 'route-status--active' }}">
+                            {{ $isInactive ? 'Ngừng hoạt động' : 'Đang hoạt động' }}
+                        </span>
                     </div>
                     <div class="route-body">
                         <div class="route-points">
@@ -109,9 +139,15 @@
                             </div>
                         </div>
 
-                        <button class="btn-book" onclick="bookRoute({{ $tuyen->matuyen }})">
-                            ĐẶT NGAY
-                        </button>
+                        @if($isInactive)
+                            <button class="btn-book btn-book--disabled" type="button" disabled aria-disabled="true">
+                                NGỪNG HOẠT ĐỘNG
+                            </button>
+                        @else
+                            <button class="btn-book" onclick="bookRoute({{ $tuyen->matuyen }})">
+                                ĐẶT NGAY
+                            </button>
+                        @endif
                     </div>
                 </div>
             @empty

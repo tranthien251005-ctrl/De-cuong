@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Thanh toán vé xe</title>
-    <link rel="stylesheet" href="/css/payment.css?v=2">
+    <link rel="stylesheet" href="/css/payment.css?v=3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -26,7 +26,7 @@
                 <p>
                     Điền họ tên và số điện thoại để xác nhận người đặt vé. Các thông tin mã vé,
                     ghế ngồi, điểm đến, ngày đi và giá tiền được hiển thị rõ ràng để bạn dễ kiểm tra
-                    trước khi thanh toán.
+                    trước khi đặt vé.
                 </p>
             </div>
 
@@ -137,8 +137,48 @@
                                 <input type="radio" id="banking" name="payment_method" value="chuyen_khoan" form="paymentConfirmForm">
                                 <label for="banking">
                                     <span class="method-title">Chuyển khoản</span>
-                                    <span class="method-desc">Thanh toán qua tài khoản ngân hàng để xác nhận nhanh hơn.</span>
+                                    <span class="method-desc">Thanh toán qua ZaloPay hoặc ứng dụng ngân hàng bằng mã QR.</span>
                                 </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bank-transfer-panel" id="bankTransferPanel" hidden>
+                        <div class="bank-transfer-head">
+                            <div>
+                                <span class="bank-transfer-kicker">QR chuyển khoản</span>
+                                <h3>Quét bằng ZaloPay hoặc ứng dụng ngân hàng</h3>
+                            </div>
+                            <strong id="transferAmount">{{ $payment['transferInfo']['formattedAmount'] ?? '' }}</strong>
+                        </div>
+
+                        <div class="bank-transfer-body">
+                            <div class="qr-card">
+                                <img src="{{ $payment['transferInfo']['qrUrl'] ?? '' }}" alt="QR chuyển khoản" id="transferQrImage">
+                                <p>Quét mã để thanh toán đúng số tiền cần trả cho đơn vé.</p>
+                            </div>
+
+                            <div class="bank-transfer-details">
+                                <div class="transfer-detail">
+                                    <span>Ngân hàng</span>
+                                    <strong>{{ $payment['transferInfo']['bankName'] ?? '' }}</strong>
+                                </div>
+                                <div class="transfer-detail">
+                                    <span>Chủ tài khoản</span>
+                                    <strong>{{ $payment['transferInfo']['accountName'] ?? '' }}</strong>
+                                </div>
+                                <div class="transfer-detail">
+                                    <span>Số tài khoản</span>
+                                    <strong>{{ $payment['transferInfo']['accountNumber'] ?? '' }}</strong>
+                                </div>
+                                <div class="transfer-detail">
+                                    <span>Số tiền</span>
+                                    <strong>{{ $payment['transferInfo']['formattedAmount'] ?? '' }}</strong>
+                                </div>
+                                <div class="transfer-detail">
+                                    <span>Nội dung chuyển khoản</span>
+                                    <strong id="transferNote">{{ $payment['transferInfo']['note'] ?? '' }}</strong>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -152,13 +192,76 @@
                         @csrf
                         <input type="hidden" name="seat_ids" value="{{ implode(',', $payment['seatIds'] ?? []) }}">
                         <input type="hidden" name="travel_date" value="{{ $payment['rawDate'] ?? '' }}">
-                        <button type="submit" class="pay-button">Xác nhận thanh toán</button>
+                        <button type="submit" class="pay-button" id="paymentSubmitButton">Đặt vé</button>
                     </form>
-                    <p class="secure-note">Thông tin thanh toán được hiển thị rõ ràng và dễ kiểm tra.</p>
+                    <p class="secure-note">
+                        Nếu chọn chuyển khoản, vé sẽ chuyển sang trạng thái chờ admin xác nhận sau khi bạn bấm đã thanh toán.
+                    </p>
                 </aside>
             </div>
         </div>
     </section>
+
+    <div class="payment-modal" id="transferModal" hidden>
+        <div class="payment-modal__backdrop" data-close-transfer-modal></div>
+        <div class="payment-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="transferModalTitle">
+            <button type="button" class="payment-modal__close" aria-label="Đóng" data-close-transfer-modal>
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="payment-modal__content">
+                <span class="payment-modal__kicker">Thanh toán chuyển khoản</span>
+                <h2 id="transferModalTitle">Quét QR để thanh toán đơn vé</h2>
+                <p class="payment-modal__intro">
+                    Vui lòng mở ZaloPay hoặc ứng dụng ngân hàng để quét mã, thanh toán đúng số tiền và nội dung bên dưới.
+                    Sau khi bấm đã thanh toán, đơn vé sẽ chuyển sang chờ admin xác nhận.
+                </p>
+
+                <div class="payment-modal__grid">
+                    <div class="payment-modal__qr">
+                        <img src="{{ $payment['transferInfo']['qrUrl'] ?? '' }}" alt="QR chuyển khoản MB">
+                        <strong>{{ $payment['transferInfo']['formattedAmount'] ?? '' }}</strong>
+                    </div>
+
+                    <div class="payment-modal__details">
+                        <div class="payment-modal__detail">
+                            <span>Ngân hàng</span>
+                            <strong>{{ $payment['transferInfo']['bankName'] ?? '' }}</strong>
+                        </div>
+                        <div class="payment-modal__detail">
+                            <span>Chủ tài khoản</span>
+                            <strong>{{ $payment['transferInfo']['accountName'] ?? '' }}</strong>
+                        </div>
+                        <div class="payment-modal__detail">
+                            <span>Số tài khoản</span>
+                            <strong>{{ $payment['transferInfo']['accountNumber'] ?? '' }}</strong>
+                        </div>
+                        <div class="payment-modal__detail">
+                            <span>Số tiền</span>
+                            <strong>{{ $payment['transferInfo']['formattedAmount'] ?? '' }}</strong>
+                        </div>
+                        <div class="payment-modal__detail">
+                            <span>Nội dung</span>
+                            <strong>{{ $payment['transferInfo']['note'] ?? '' }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-modal__actions">
+                    <button type="button" class="payment-modal__secondary" data-close-transfer-modal>Quay lại</button>
+                    <button type="button" class="payment-modal__primary" id="confirmTransferButton">Tôi đã thanh toán</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="payment-toast" id="paymentToast" hidden>
+        <i class="fas fa-circle-check"></i>
+        <div>
+            <strong>Đã ghi nhận yêu cầu thanh toán</strong>
+            <p>Đơn vé của bạn đang chờ admin xác nhận chuyển khoản.</p>
+        </div>
+    </div>
 
     <script>
         const data = @json($payment ?? session('payment'));
@@ -168,6 +271,53 @@
         const seatNumber = data?.seats || '';
         const ticketCode = data?.ticketCode || '';
         const totalPrice = data?.total || '';
+        const bankingRadio = document.getElementById('banking');
+        const cashRadio = document.getElementById('cash');
+        const bankTransferPanel = document.getElementById('bankTransferPanel');
+        const paymentConfirmForm = document.getElementById('paymentConfirmForm');
+        const paymentSubmitButton = document.getElementById('paymentSubmitButton');
+        const transferModal = document.getElementById('transferModal');
+        const confirmTransferButton = document.getElementById('confirmTransferButton');
+        const paymentToast = document.getElementById('paymentToast');
+        let isTransferConfirmed = false;
+
+        function syncTransferPanel() {
+            if (!bankTransferPanel) {
+                return;
+            }
+
+            bankTransferPanel.hidden = !bankingRadio?.checked;
+            if (paymentSubmitButton) {
+                paymentSubmitButton.textContent = bankingRadio?.checked ? 'Đặt vé' : 'Đặt vé';
+            }
+        }
+
+        function openTransferModal() {
+            if (!transferModal) {
+                return;
+            }
+
+            transferModal.hidden = false;
+            document.body.classList.add('payment-modal-open');
+        }
+
+        function closeTransferModal() {
+            if (!transferModal) {
+                return;
+            }
+
+            transferModal.hidden = true;
+            document.body.classList.remove('payment-modal-open');
+        }
+
+        function showPaymentToast() {
+            if (!paymentToast) {
+                return;
+            }
+
+            paymentToast.hidden = false;
+            requestAnimationFrame(() => paymentToast.classList.add('is-visible'));
+        }
 
         document.title = `Thanh toán vé xe ${fromPlace} - ${toPlace}`;
         document.getElementById('seatNumber').value = seatNumber;
@@ -183,6 +333,30 @@
         document.getElementById('summaryDestination').textContent = toPlace;
         document.getElementById('summaryPrice').textContent = totalPrice;
         document.getElementById('totalAmount').textContent = totalPrice;
+
+        bankingRadio?.addEventListener('change', syncTransferPanel);
+        cashRadio?.addEventListener('change', syncTransferPanel);
+        paymentConfirmForm?.addEventListener('submit', function (event) {
+            if (!bankingRadio?.checked || isTransferConfirmed) {
+                return;
+            }
+
+            event.preventDefault();
+            openTransferModal();
+        });
+
+        document.querySelectorAll('[data-close-transfer-modal]').forEach((element) => {
+            element.addEventListener('click', closeTransferModal);
+        });
+
+        confirmTransferButton?.addEventListener('click', function () {
+            isTransferConfirmed = true;
+            closeTransferModal();
+            showPaymentToast();
+            window.setTimeout(() => paymentConfirmForm?.submit(), 900);
+        });
+
+        syncTransferPanel();
     </script>
 
     @include('pages.footer')

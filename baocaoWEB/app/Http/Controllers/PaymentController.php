@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Ghe;
 use App\Models\TuyenXe;
 use App\Models\Ve;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +31,7 @@ class PaymentController extends Controller
             $seatIds = Ghe::where('maxe', $tuyen->maxe)
                 ->whereIn('tenghe', $seats)
                 ->pluck('maghe')
-                ->map(fn($id) => (int) $id)
+                ->map(fn ($id) => (int) $id)
                 ->all();
         }
 
@@ -44,6 +43,20 @@ class PaymentController extends Controller
         $total = $unitPrice * $count;
 
         $ticketCode = ((int) Ve::max('mave')) + 1;
+        $transferNote = sprintf('VE %s TUYEN %s', $ticketCode, (int) $tuyen->matuyen);
+        $transferInfo = [
+            'bankName' => 'MB Bank',
+            'bankCode' => '970422',
+            'accountName' => 'PHAM DINH LUAN',
+            'accountNumber' => '0387705640',
+            'amount' => $total,
+            'formattedAmount' => number_format($total, 0, ',', '.') . ' VND',
+            'note' => $transferNote,
+            'qrUrl' => 'https://img.vietqr.io/image/970422-0387705640-compact2.png?amount='
+                . $total
+                . '&addInfo=' . urlencode($transferNote)
+                . '&accountName=' . urlencode('PHAM DINH LUAN'),
+        ];
 
         $payment = [
             'from' => $tuyen->diemdi ?? '',
@@ -56,6 +69,8 @@ class PaymentController extends Controller
             'ticketCode' => $ticketCode,
             'unitPrice' => number_format($unitPrice, 0, ',', '.') . ' VND',
             'total' => number_format($total, 0, ',', '.') . ' VND',
+            'rawTotal' => $total,
+            'transferInfo' => $transferInfo,
         ];
 
         session(['payment' => $payment]);
@@ -98,15 +113,19 @@ class PaymentController extends Controller
                 throw new \RuntimeException('Ghế không hợp lệ cho tuyến xe này.');
             }
 
-            if ($ghes->contains(fn($ghe) => $ghe->trangthai === 'da_dat')) {
+            if ($ghes->contains(fn ($ghe) => $ghe->trangthai === 'da_dat')) {
                 throw new \RuntimeException('Một số ghế đã được đặt. Vui lòng chọn ghế khác.');
             }
 
             foreach ($ghes as $ghe) {
-                // Tạo vé
-                $this->createTicket($ghe, (int) $accountId, $ngayDat, (int) ($tuyen->giatien ?? 0), $validated['payment_method']);
+                $this->createTicket(
+                    $ghe,
+                    (int) $accountId,
+                    $ngayDat,
+                    (int) ($tuyen->giatien ?? 0),
+                    $validated['payment_method']
+                );
 
-                // Cập nhật trạng thái ghế
                 $ghe->trangthai = 'da_dat';
                 $ghe->save();
             }
@@ -115,26 +134,26 @@ class PaymentController extends Controller
 
             session()->forget('payment');
 
-            return redirect()
-                ->route('home')
-                ->with('success', 'Vé của bạn đã được lưu. Bạn có thể xem lại trong mục Hóa đơn.');
+            $message = $validated['payment_method'] === 'chuyen_khoan'
+                ? 'Yêu cầu thanh toán đã được ghi nhận. Vé của bạn đang chờ admin xác nhận chuyển khoản.'
+                : 'Vé của bạn đã được lưu. Bạn có thể xem lại trong mục Hóa đơn.';
+
+            return redirect()->route('home')->with('success', $message);
         } catch (\RuntimeException $e) {
             DB::rollBack();
             return back()->withErrors([$e->getMessage()]);
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Payment error: ' . $e->getMessage());
-            return back()->withErrors(['Có lỗi xảy ra, vui lòng thử lại sau!']);
+            return back()->withErrors(['Có lỗi xảy ra, vui lòng thử lại sau.']);
         }
     }
 
-    /**
-     * Tạo vé mới
-     */
     private function createTicket(Ghe $ghe, int $accountId, string $ngayDat, int $total, string $paymentMethod): void
     {
-        // Vé mới được tạo theo trạng thái hành trình để đồng bộ với trang quản lý vé.
-        $trangThai = 'cho_don';
+        $trangThai = $paymentMethod === 'chuyen_khoan'
+            ? 'cho_xac_nhan'
+            : 'cho_don';
 
         Ve::create([
             'maghe' => $ghe->maghe,

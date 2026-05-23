@@ -621,8 +621,10 @@ class AdminController extends Controller
             $totalRevenue = $tickets->sum('tongsotien');
             $daThanhToan = $tickets->where('trangthai', 'da_di')->count();
             $choThanhToan = $tickets->where('trangthai', 'cho_don')->count();
+            $choXacNhan = $tickets->where('trangthai', 'cho_xac_nhan')->count();
+            $huyVe = $tickets->where('trangthai', 'chua_thanh_toan')->count();
 
-            return view('admin.tickets', compact('tickets', 'totalTickets', 'totalRevenue', 'daThanhToan', 'choThanhToan'));
+            return view('admin.tickets', compact('tickets', 'totalTickets', 'totalRevenue', 'daThanhToan', 'choThanhToan', 'choXacNhan', 'huyVe'));
         } catch (\Exception $e) {
             Log::error('Admin tickets error: ' . $e->getMessage());
             $tickets = [];
@@ -630,7 +632,9 @@ class AdminController extends Controller
             $totalRevenue = 0;
             $daThanhToan = 0;
             $choThanhToan = 0;
-            return view('admin.tickets', compact('tickets', 'totalTickets', 'totalRevenue', 'daThanhToan', 'choThanhToan'));
+            $choXacNhan = 0;
+            $huyVe = 0;
+            return view('admin.tickets', compact('tickets', 'totalTickets', 'totalRevenue', 'daThanhToan', 'choThanhToan', 'choXacNhan', 'huyVe'));
         }
     }
 
@@ -638,7 +642,7 @@ class AdminController extends Controller
     public function updateTicketStatus(Request $request, $id)
     {
         $request->validate([
-            'trangthai' => 'required|in:cho_don,da_di',
+            'trangthai' => 'required|in:cho_xac_nhan,cho_don,da_di,chua_thanh_toan',
         ]);
 
         try {

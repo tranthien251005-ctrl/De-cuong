@@ -47,18 +47,17 @@ class Ve extends Model
 
     public function getTongSoTienFormattedAttribute()
     {
-        return number_format($this->tongsotien, 0, ',', '.') . 'đ';
+        return number_format((int) $this->tongsotien, 0, ',', '.') . 'đ';
     }
 
     public function getTrangThaiBadgeAttribute()
     {
-        switch ($this->trangthai) {
-            case 'cho_don':
-                return '<span class="badge-warning"><i class="fas fa-clock"></i> Chờ đón</span>';
-            case 'da_di':
-                return '<span class="badge-success"><i class="fas fa-check-circle"></i> Đã đi</span>';
-            default:
-                return '<span class="badge-info">' . $this->trangthai . '</span>';
-        }
+        return match ($this->trangthai) {
+            'chua_thanh_toan' => '<span class="badge-danger"><i class="fas fa-ban"></i> Đã hủy</span>',
+            'cho_xac_nhan' => '<span class="badge-info"><i class="fas fa-hourglass-half"></i> Chờ xác nhận thanh toán</span>',
+            'cho_don' => '<span class="badge-warning"><i class="fas fa-circle-check"></i> Đã thanh toán</span>',
+            'da_di' => '<span class="badge-success"><i class="fas fa-check-circle"></i> Đã đi</span>',
+            default => '<span class="badge-info">' . e((string) $this->trangthai) . '</span>',
+        };
     }
 }

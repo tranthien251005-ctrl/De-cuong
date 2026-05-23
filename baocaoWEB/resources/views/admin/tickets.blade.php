@@ -59,8 +59,8 @@
                     <div class="stat-card">
                         <div class="stat-card-content">
                             <div>
-                                <p class="stat-label">Đã đi</p>
-                                <p class="stat-value">{{ $daThanhToan ?? 0 }}</p>
+                                <p class="stat-label">Đã thanh toán</p>
+                                <p class="stat-value">{{ $choThanhToan ?? 0 }}</p>
                             </div>
                             <div class="stat-icon bg-success-100">
                                 <i class="fas fa-check-circle text-success-600"></i>
@@ -70,8 +70,8 @@
                     <div class="stat-card">
                         <div class="stat-card-content">
                             <div>
-                                <p class="stat-label">Chờ đón</p>
-                                <p class="stat-value">{{ $choThanhToan ?? 0 }}</p>
+                                <p class="stat-label">Chờ xác nhận CK</p>
+                                <p class="stat-value">{{ $choXacNhan ?? 0 }}</p>
                             </div>
                             <div class="stat-icon bg-warning-100">
                                 <i class="fas fa-clock text-warning-600"></i>
@@ -86,7 +86,9 @@
                         <input type="date" id="filterDateTo" class="filter-input" placeholder="Đến ngày">
                         <select id="filterStatus" class="filter-select">
                             <option value="">Tất cả trạng thái</option>
-                            <option value="cho_don">Chờ đón</option>
+                            <option value="cho_xac_nhan">Chờ xác nhận thanh toán</option>
+                            <option value="cho_don">Đã thanh toán</option>
+                            <option value="chua_thanh_toan">Chưa thanh toán / Hủy vé</option>
                             <option value="da_di">Đã đi</option>
                         </select>
                         <input type="text" id="searchInput" placeholder="Mã vé / SĐT khách..." class="filter-search">
@@ -116,7 +118,7 @@
                         </thead>
                         <tbody>
                             @forelse($tickets as $ticket)
-                                <tr class="ticket-row" data-status="{{ $ticket->trangthai }}" data-search="{{ strtolower($ticket->mave . ' ' . ($ticket->taiKhoan->phone ?? '')) }}">
+                                <tr class="ticket-row" data-status="{{ $ticket->trangthai }}" data-search="{{ strtolower($ticket->mave . ' ' . ($ticket->so_dien_thoai ?? '')) }}">
                                     <td class="font-medium" style="color: #2563eb;">#V{{ str_pad($ticket->mave, 6, '0', STR_PAD_LEFT) }}</td>
                                     <td>{{ $ticket->ten_khach }}</td>
                                     <td>{{ $ticket->so_dien_thoai }}</td>
@@ -134,7 +136,11 @@
                                         @if($ticket->trangthai == 'da_di')
                                             <span class="badge-success"><i class="fas fa-check-circle"></i> Đã đi</span>
                                         @elseif($ticket->trangthai == 'cho_don')
-                                            <span class="badge-warning"><i class="fas fa-clock"></i> Chờ đón</span>
+                                            <span class="badge-warning"><i class="fas fa-wallet"></i> Đã thanh toán</span>
+                                        @elseif($ticket->trangthai == 'chua_thanh_toan')
+                                            <span class="badge-danger"><i class="fas fa-ban"></i> Đã hủy</span>
+                                        @elseif($ticket->trangthai == 'cho_xac_nhan')
+                                            <span class="badge-info"><i class="fas fa-hourglass-half"></i> Chờ xác nhận thanh toán</span>
                                         @else
                                             <span class="badge-info"><i class="fas fa-info-circle"></i> {{ $ticket->trangthai }}</span>
                                         @endif
@@ -198,7 +204,9 @@
                 <div class="form-group">
                     <label class="form-label">Trạng thái <span class="required">*</span></label>
                     <select id="trangthai" name="trangthai" class="form-select" required>
-                        <option value="cho_don">Chờ đón</option>
+                        <option value="cho_xac_nhan">Chờ xác nhận thanh toán</option>
+                        <option value="cho_don">Đã thanh toán</option>
+                        <option value="chua_thanh_toan">Chưa thanh toán</option>
                         <option value="da_di">Đã đi</option>
                     </select>
                 </div>
@@ -217,7 +225,7 @@
             </div>
             <div class="modal-body">
                 <p>Bạn có chắc chắn muốn xóa vé này?</p>
-                <p class="text-sm text-gray-500 mt-2">Hành động này không thể hoàn tác!</p>
+                <p class="text-sm text-gray-500 mt-2">Hành động này không thể hoàn tác.</p>
             </div>
             <div class="modal-footer">
                 <button onclick="closeDeleteTicketModal()" class="btn-outline">Hủy</button>

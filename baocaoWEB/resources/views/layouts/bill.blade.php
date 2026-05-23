@@ -25,7 +25,7 @@
                     <strong>{{ $summary['total'] }}</strong>
                 </div>
                 <div class="bill-summary-card">
-                    <span>Chờ đón</span>
+                    <span>Chờ xác nhận</span>
                     <strong>{{ $summary['waiting'] }}</strong>
                 </div>
                 <div class="bill-summary-card">
@@ -44,16 +44,18 @@
                         <h2>Danh sách hóa đơn</h2>
                         <p>
                             @if ($account)
-                                Đang hiển thị hóa đơn của {{ $account->hoten ?: $account->phone }}.
+                                Đang hiển thị các vé mà tài khoản {{ $account->hoten ?: $account->phone }} đã đặt.
                             @else
-                                Hóa đơn được lấy theo số điện thoại tài khoản đang đăng nhập.
+                                Hóa đơn được lấy theo tài khoản đang đăng nhập.
                             @endif
                         </p>
                     </div>
 
                     <div class="bill-filters" aria-label="Lọc hóa đơn theo trạng thái">
                         <button class="bill-filter-btn is-active" type="button" data-filter="all">Tất cả</button>
-                        <button class="bill-filter-btn" type="button" data-filter="waiting">Chờ đón</button>
+                        <button class="bill-filter-btn" type="button" data-filter="pending">Chờ xác nhận</button>
+                        <button class="bill-filter-btn" type="button" data-filter="waiting">Đã thanh toán</button>
+                        <button class="bill-filter-btn" type="button" data-filter="cancelled">Đã hủy</button>
                         <button class="bill-filter-btn" type="button" data-filter="done">Đã đi</button>
                     </div>
                 </div>
@@ -77,7 +79,17 @@
                                 <tr class="bill-row" data-status="{{ $bill->status_key }}">
                                     <td data-label="Mã hóa đơn">
                                         <span class="bill-code">HD-{{ $bill->mave }}</span>
-                                        <span class="bill-caption">Hóa đơn đã thanh toán</span>
+                                        <span class="bill-caption">
+                                            @if ($bill->status_key === 'cancelled')
+                                                Vé đã bị hủy do admin xác nhận chưa thanh toán
+                                            @elseif ($bill->status_key === 'pending')
+                                                Đơn vé đang chờ admin xác nhận chuyển khoản
+                                            @elseif ($bill->status_key === 'waiting')
+                                                Vé đã thanh toán và sẵn sàng cho chuyến đi
+                                            @else
+                                                Hóa đơn đã hoàn tất chuyến đi
+                                            @endif
+                                        </span>
                                     </td>
                                     <td data-label="Tuyến xe"><span class="bill-route">{{ $bill->route_label }}</span></td>
                                     <td data-label="Ngày đi">{{ $bill->date_label }}</td>

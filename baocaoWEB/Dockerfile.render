@@ -7,6 +7,7 @@ RUN composer install \
     --no-dev \
     --prefer-dist \
     --no-interaction \
+    --no-scripts \
     --optimize-autoloader
 
 FROM php:8.2-cli
@@ -22,11 +23,13 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /var/www/html
 
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY . .
 COPY --from=vendor /app/vendor ./vendor
 
 RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && composer dump-autoload --no-dev --optimize --no-interaction
 
 EXPOSE 10000
 

@@ -16,19 +16,19 @@ Mục tiêu của hệ thống:
 
 ## Thành Viên Nhóm
 
-| STT | Họ và tên       | MSSV        | Vai trò     |
-| --- | --------------- | ----------- | ----------- |
-| 1   | Phạm Đình Luân  | 23810310282 | Nhóm trưởng |
-| 2   | Trần Ngọc Thiện | 23810310271 | Thành viên  |
+| STT | Họ và tên        | MSSV        | Vai trò      |
+| --- | ---------------- | ----------- | ------------ |
+| 1   | Phạm Đình Luân   | 23810310282 | Nhóm trưởng  |
+| 2   | Trần Ngọc Thiện  | 23810310271 | Thành viên   |
 
 ## Công Nghệ Sử Dụng
 
-| Thành phần        | Công nghệ                    |
-| ----------------- | ---------------------------- |
-| Backend           | Laravel 12, PHP 8.2          |
-| Frontend          | Blade, HTML, CSS, JavaScript |
-| Cơ sở dữ liệu     | PostgreSQL/Supabase          |
-| Quản lý phụ thuộc | Composer, NPM                |
+| Thành phần        | Công nghệ                     |
+| ----------------- | ----------------------------- |
+| Backend           | Laravel 12, PHP 8.2           |
+| Frontend          | Blade, HTML, CSS, JavaScript  |
+| Cơ sở dữ liệu     | PostgreSQL/Supabase           |
+| Quản lý phụ thuộc | Composer, NPM                 |
 
 ## Tài Liệu Đặc Tả Phần Mềm
 
@@ -50,29 +50,29 @@ Phạm vi hiện tại của dự án đã cập nhật:
 
 ### 2. Tác Nhân Hệ Thống
 
-| Tác nhân              | Mô tả                                                                  |
-| --------------------- | ---------------------------------------------------------------------- |
-| Khách vãng lai        | Truy cập trang chủ, xem danh sách tuyến xe, mở trang đăng nhập/đăng ký |
-| Người dùng đã đăng ký | Đăng nhập, tìm chuyến, chọn ghế, đặt vé và xem hóa đơn                 |
-| Quản trị viên         | Truy cập khu vực quản trị và các màn hình quản lý cơ bản               |
+| Tác nhân                 | Mô tả                                                                       |
+| ------------------------ | --------------------------------------------------------------------------- |
+| Khách vãng lai           | Truy cập trang chủ, xem danh sách tuyến xe, mở trang đăng nhập/đăng ký     |
+| Người dùng đã đăng ký    | Đăng nhập, tìm chuyến, chọn ghế, đặt vé và xem hóa đơn                      |
+| Quản trị viên            | Truy cập khu vực quản trị và các màn hình quản lý cơ bản                    |
 
 ### 3. Yêu Cầu Chức Năng
 
-| Mã         | Chức năng          | Mô tả                                                                                       | Trạng thái    |
-| ---------- | ------------------ | ------------------------------------------------------------------------------------------- | ------------- |
-| AUTH-01    | Đăng nhập          | Người dùng đăng nhập bằng số điện thoại và mật khẩu, lưu thông tin vào session              | Đã hoàn thành |
-| AUTH-02    | Đăng xuất          | Xóa session đăng nhập và điều hướng người dùng khỏi phiên hiện tại                          | Đã hoàn thành |
-| AUTH-03    | Đăng ký            | Người dùng đăng ký tài khoản bằng số điện thoại, mật khẩu và thông tin cá nhân              | Đã hoàn thành |
-| HOME-01    | Trang chủ          | Hiển thị hero, bộ lọc tìm chuyến, danh sách tuyến xe, header và footer                      | Đã hoàn thành |
-| SEARCH-01  | Tìm tuyến xe       | Lọc tuyến xe theo điểm đi, điểm đến và thời gian dự kiến từ cột `thoigiandukien`            | Đã hoàn thành |
-| ROUTE-01   | Hiển thị tuyến xe  | Hiển thị tên tuyến, điểm đi, điểm đến, thời gian dự kiến, khoảng cách và giá vé từ database | Đã hoàn thành |
-| BOOK-01    | Chọn ghế           | Người dùng chọn ghế theo tuyến xe, hệ thống kiểm tra ghế đã đặt và ghế còn trống            | Đã hoàn thành |
-| PAYMENT-01 | Thanh toán/đặt vé  | Xác nhận đặt vé, lưu dữ liệu vào bảng `ve`, cập nhật trạng thái ghế đã đặt                  | Đang cập nhật |
-| PAYMENT-02 | Thông báo đặt vé   | Sau khi đặt vé thành công, trang home hiển thị thông báo “Đặt vé thành công”                | Đã hoàn thành |
-| BILL-01    | Hóa đơn            | Hiển thị danh sách hóa đơn/vé của tài khoản đang đăng nhập, không dùng dữ liệu mẫu          | Đã hoàn thành |
-| BILL-02    | Lọc hóa đơn        | Lọc hóa đơn theo trạng thái chờ đón/đã đi trên giao diện                                    | Đã hoàn thành |
-| UI-01      | Header dùng chung  | Cập nhật header mới, có logo, điều hướng, trạng thái active và nút đăng nhập/đăng xuất      | Đã hoàn thành |
-| ADMIN-01   | Giao diện quản trị | Có các view quản trị cơ bản cho người dùng, xe, tuyến, chuyến, vé     | Đã hoàn thành|
+| Mã         | Chức năng            | Mô tả                                                                                         | Trạng thái       |
+| ---------- | -------------------- | --------------------------------------------------------------------------------------------- | ---------------- |
+| AUTH-01    | Đăng nhập            | Người dùng đăng nhập bằng số điện thoại và mật khẩu, lưu thông tin vào session               | Đã hoàn thành    |
+| AUTH-02    | Đăng xuất            | Xóa session đăng nhập và điều hướng người dùng khỏi phiên hiện tại                            | Đã hoàn thành    |
+| AUTH-03    | Đăng ký              | Người dùng đăng ký tài khoản bằng số điện thoại, mật khẩu và thông tin cá nhân               | Đã hoàn thành    |
+| HOME-01    | Trang chủ            | Hiển thị hero, bộ lọc tìm chuyến, danh sách tuyến xe, header và footer                       | Đã hoàn thành    |
+| SEARCH-01  | Tìm tuyến xe         | Lọc tuyến xe theo điểm đi, điểm đến và thời gian dự kiến từ cột `thoigiandukien`             | Đã hoàn thành    |
+| ROUTE-01   | Hiển thị tuyến xe    | Hiển thị tên tuyến, điểm đi, điểm đến, thời gian dự kiến, khoảng cách và giá vé từ database  | Đã hoàn thành    |
+| BOOK-01    | Chọn ghế             | Người dùng chọn ghế theo tuyến xe, hệ thống kiểm tra ghế đã đặt và ghế còn trống             | Đã hoàn thành    |
+| PAYMENT-01 | Thanh toán/đặt vé    | Xác nhận đặt vé, lưu dữ liệu vào bảng `ve`, cập nhật trạng thái ghế đã đặt                   | Đang cập nhật    |
+| PAYMENT-02 | Thông báo đặt vé     | Sau khi đặt vé thành công, trang home hiển thị thông báo "Đặt vé thành công"                 | Đã hoàn thành    |
+| BILL-01    | Hóa đơn              | Hiển thị danh sách hóa đơn/vé của tài khoản đang đăng nhập, không dùng dữ liệu mẫu           | Đã hoàn thành    |
+| BILL-02    | Lọc hóa đơn          | Lọc hóa đơn theo trạng thái chờ đón/đã đi trên giao diện                                      | Đã hoàn thành    |
+| UI-01      | Header dùng chung    | Cập nhật header mới, có logo, điều hướng, trạng thái active và nút đăng nhập/đăng xuất       | Đã hoàn thành    |
+| ADMIN-01   | Giao diện quản trị   | Có các view quản trị cơ bản cho người dùng, xe, tuyến, chuyến, vé                            | Đã hoàn thành    |
 
 ### 4. Yêu Cầu Phi Chức Năng
 
@@ -173,6 +173,15 @@ Truy cập:
 ```text
 http://127.0.0.1:8000
 ```
+
+## Tài Khoản Đăng Nhập Mẫu
+
+Sử dụng 2 tài khoản sau để đăng nhập và kiểm tra 2 vai trò khác nhau trong hệ thống:
+
+| Vai trò     | Tên đăng nhập | Mật khẩu       | Ghi chú                     |
+| ----------- | ------------- | -------------- | --------------------------- |
+| Admin       | `admin`       | `admin123456`  | Tài khoản quản trị          |
+| Khách hàng  | `0325419669`  | `12345678`     | Tài khoản người dùng        |
 
 ## Tài Liệu Liên Quan
 
